@@ -81,7 +81,7 @@ export class CylinderTexture extends BaseShape {
     }
 
     initTextures() {
-        const textureUrls = ['./../../base/textures/your_texture_file.png'];
+        const textureUrls = ['./../../base/textures/wheelTexture-1.png'];
         let imageLoader = new ImageLoader();
         imageLoader.load((textureImages) => {
             const textureImage = textureImages[0];

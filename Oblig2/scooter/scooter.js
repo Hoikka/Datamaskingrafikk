@@ -6,6 +6,8 @@ import {Stack} from "../../base/helpers/Stack.js";
 import {CylinderTexture} from "../../base/shapes/CylinderTexture.js";
 import {CubeTextured} from "../../base/shapes/CubeTextured.js";
 import {Cube} from "../../base/shapes/Cube.js";
+import {Cylinder} from "../../base/shapes/Cylinder.js";
+import {Wheel} from "../../base/shapes/Wheel.js";
 
 export class Scooter {
     constructor(app) {
@@ -15,6 +17,9 @@ export class Scooter {
 
         this.bodyPart = new CubeTextured(app, {red:0.8, green:0.0, blue:0.6, alpha:1}, false);
         this.bodyPart.initBuffers();
+
+        this.wheel = new Wheel(app);
+        this.wheel.initBuffers();
 
         this.rotationX = 0;
         this.translationX = 0;
@@ -45,7 +50,7 @@ export class Scooter {
         modelMatrix = this.stack.peekMatrix(modelMatrix);
 
 
-        this.drawPlatform(shaderInfo, textureShaderInfo, elapsed, modelMatrix)
+        this.drawPlatform(shaderInfo, textureShaderInfo, elapsed, modelMatrix);
 
     }
 
@@ -59,14 +64,14 @@ export class Scooter {
         // Front body element
         modelMatrix = this.stack.peekMatrix();
         modelMatrix.translate(5, 1, 0);
-        modelMatrix.rotate(45, 0, 0);
+        modelMatrix.rotate(45, 0, 0, 1);
         modelMatrix.scale(1, 0.5, 0.5);
         this.bodyPart.draw(textureShaderInfo, elapsed, modelMatrix);
 
         // Back body element
         modelMatrix = this.stack.peekMatrix();
         modelMatrix.translate(-4, 1, 0);
-        modelMatrix.rotate(-45, 0, 0);
+        modelMatrix.rotate(-45, 0, 0, 1);
         modelMatrix.scale(1, 0.25, 0.5);
         this.bodyPart.draw(textureShaderInfo, elapsed, modelMatrix);
 
@@ -75,5 +80,18 @@ export class Scooter {
         modelMatrix.translate(-5, 2, 0);
         modelMatrix.scale(1, 0.25, 0.5);
         this.bodyPart.draw(textureShaderInfo, elapsed, modelMatrix);
+
+        // Back wheel
+        modelMatrix = this.stack.peekMatrix();
+        modelMatrix.translate(-6.2, 0, -0.5);
+        this.stack.pushMatrix(modelMatrix);
+        this.drawWheels(shaderInfo, textureShaderInfo, elapsed, modelMatrix)
+        this.stack.popMatrix();
+    }
+
+    drawWheels(shaderInfo, textureShaderInfo, elapsed, modelMatrix){
+        modelMatrix = this.stack.peekMatrix();
+
+        this.wheel.draw(textureShaderInfo, elapsed, modelMatrix);
     }
 }
