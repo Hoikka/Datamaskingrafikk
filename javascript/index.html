@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+    <meta charset="utf-8">
+    <title>Html canvas</title>
+    <link rel="stylesheet" href="../../base/webgl.css" type="text/css">
+</head>
+
+<body>
+    <div style="top:0px; left:15px; width:100%; text-align:left; color:black; " class="ui">
+        <h2>Html canvas</h2>
+    </div>
+
+    <!-- Lager en div med et canvas, referer canvaset fra scriptet -->
+    <div id="div">
+        <canvas style="background-color:lightcyan;" id="canvas" width="960" height="640">
+        </canvas>
+    </div>
+    <button onclick="alert('Hei!')">Klikk meg!</button>
+    <button onclick="showDialog('Hei på deg!')">Klikk meg også!</button>
+    <script>
+        let canvasElem = document.getElementById("canvas")
+        let gl = canvasElem.getContext('2d');
+        gl.fillStyle = 'rgba(0, 255, 0)';   //Setter farge.
+        gl.fillRect(10, 50, 250, 250);      //Fylt rektangel.
+
+        function showDialog(text) {
+	        alert(text)
+        }
+    </script>
+    <!--
+    <script>
+        // Tilsvarende vha. Javascript:
+
+	    // Oppretter html5-canvas (pakket inn i et div-element):
+	    let divWrapper = document.createElement('div');
+	    let canvasElem = document.createElement('canvas');
+	    // Setter størrlse:
+	    canvasElem.width = 960;
+	    canvasElem.height = 640;
+		// Legger canvasElem til divWrapper
+	    divWrapper.appendChild(canvasElem);
+	    divWrapper.id = 'my2DCanvas';
+
+		// Legger divWrapper til document
+	    document.body.appendChild(divWrapper);
+
+	    // Henter ut gl-objektet (RenderingContext for 2D):
+	    let gl = canvasElem.getContext('2d');
+	    gl.fillStyle = 'rgba(0, 255, 0)';  //Setter farge.
+	    gl.fillRect(0, 0, 250, 250);   //Fylt rektangel.
+    </script>
+    -->
+</body>
+</html>
