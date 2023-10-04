@@ -5,6 +5,7 @@
 import {Stack} from "../../base/helpers/Stack.js";
 import {CylinderTexture} from "../../base/shapes/CylinderTexture.js";
 import {CubeTextured} from "../../base/shapes/CubeTextured.js";
+import {Cube} from "../../base/shapes/Cube.js";
 
 export class Scooter {
     constructor(app) {
@@ -19,7 +20,7 @@ export class Scooter {
         this.translationX = 0;
     }
 
-    handleKeys() {
+    handleKeys(elapsed) {
         if (this.app.currentlyPressedKeys['KeyN']) {
             this.rotationX += 1.0;
         }
@@ -27,7 +28,7 @@ export class Scooter {
             this.rotationX -= 1.0;
         }
         if (this.app.currentlyPressedKeys['KeyF']) {
-            this.rotationX -= 1.0;
+            this.rotationX += 1.0;
         }
         if (this.app.currentlyPressedKeys['KeyG']) {
             this.rotationX -= 1.0;

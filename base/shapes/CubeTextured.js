@@ -183,7 +183,7 @@ export class CubeTextured extends BaseShape {
 
     draw(shaderInfo, elapsed, modelMatrix = (new Matrix4()).setIdentity()) {
         super.draw(shaderInfo, elapsed, modelMatrix);
-        if (this.wireFr ame) {
+        if (this.wireFrame) {
             this.gl.drawArrays(this.gl.LINE_STRIP, 0, this.vertexCount);
         } else {
             this.gl.drawArrays(this.gl.TRIANGLES, 0, this.vertexCount);
