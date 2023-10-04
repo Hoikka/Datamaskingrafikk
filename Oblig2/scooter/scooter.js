@@ -65,14 +65,14 @@ export class Scooter {
 
         // Back body element
         modelMatrix = this.stack.peekMatrix();
-        modelMatrix.translate(-5, 1, 0);
+        modelMatrix.translate(-4, 1, 0);
         modelMatrix.rotate(-45, 0, 0);
         modelMatrix.scale(1, 0.25, 0.5);
         this.bodyPart.draw(textureShaderInfo, elapsed, modelMatrix);
 
         // Back spoiler element
         modelMatrix = this.stack.peekMatrix();
-        modelMatrix.translate(-6, 2, 0);
+        modelMatrix.translate(-5, 2, 0);
         modelMatrix.scale(1, 0.25, 0.5);
         this.bodyPart.draw(textureShaderInfo, elapsed, modelMatrix);
     }

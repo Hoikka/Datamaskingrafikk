@@ -143,7 +143,7 @@ export class CubeTextured extends BaseShape {
      * Denne kalles fra initBuffers() i BaseShape.
      */
     initTextures() {
-        const textureUrls = ['./../../base/textures/bricks1.png'];
+        const textureUrls = ['./../../base/textures/metal1.png'];
 
         if (this.textureCoordinates.length > 0) {
             //Laster textureUrls...
