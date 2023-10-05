@@ -15,11 +15,18 @@ export class Scooter {
 
         this.stack = new Stack();
 
+        //init of different parts
         this.bodyPart = new CubeTextured(app, {red:0.8, green:0.0, blue:0.6, alpha:1}, false);
         this.bodyPart.initBuffers();
 
         this.wheel = new Wheel(app);
         this.wheel.initBuffers();
+
+        this.cylinder = new Cylinder(app,{red:0, green:0.0, blue:1, alpha:1},1,1,20);
+        this.cylinder.initBuffers();
+
+        this.cylinderBlack = new Cylinder(app,{red:0, green:0, blue:0, alpha:1},1,1,20);
+        this.cylinderBlack.initBuffers();
 
         this.rotationX = 0;
         this.translationX = 0;
@@ -51,6 +58,7 @@ export class Scooter {
 
 
         this.drawPlatform(shaderInfo, textureShaderInfo, elapsed, modelMatrix);
+        this.drawHandle(shaderInfo,textureShaderInfo,elapsed,modelMatrix);
 
     }
 
@@ -93,5 +101,35 @@ export class Scooter {
         modelMatrix = this.stack.peekMatrix();
 
         this.wheel.draw(textureShaderInfo, elapsed, modelMatrix);
+    }
+    drawHandle(shaderInfo,textureShaderInfo,elapsed,modelMatrix){
+
+        //long neck
+        modelMatrix = this.stack.peekMatrix();
+        modelMatrix.translate(6, 0, 0);
+        modelMatrix.scale(0.3, 10, 0.3);
+        this.cylinder.draw(shaderInfo,elapsed,modelMatrix);
+
+        //base neck
+        modelMatrix = this.stack.peekMatrix();
+        modelMatrix.translate(6, -0.2, 0);
+        modelMatrix.scale(0.5, 3, 0.5);
+        this.cylinder.draw(shaderInfo,elapsed,modelMatrix);
+
+        //blue handle
+        modelMatrix = this.stack.peekMatrix();
+        modelMatrix.rotate(90,1,0,0)
+        modelMatrix.translate(6,-3,-10);
+        modelMatrix.scale(0.3,6,0.3)
+        this.cylinder.draw(shaderInfo,elapsed,modelMatrix);
+
+        //black handle (left)
+        modelMatrix.scale(1.1,0.3,1.1);
+        this.cylinderBlack.draw(shaderInfo,elapsed,modelMatrix);
+
+        //black handle (right)
+        modelMatrix.translate(0,2.4,0);
+        this.cylinderBlack.draw(shaderInfo,elapsed,modelMatrix);
+
     }
 }
