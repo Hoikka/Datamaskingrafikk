@@ -1,6 +1,6 @@
 import {BaseApp} from '../../base/BaseApp.js';
 import {Scooter} from '../scooter/scooter.js';
-import {WebGLShader} from "../../../WebGL/base/helpers/WebGLShader.js";
+import {WebGLShader} from "../../base/helpers/WebGLShader.js";
 
 export class MyScooterApp extends BaseApp {
     constructor() {
