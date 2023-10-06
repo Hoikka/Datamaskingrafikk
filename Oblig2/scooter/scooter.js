@@ -28,22 +28,23 @@ export class Scooter {
         this.cylinderBlack = new Cylinder(app,{red:0, green:0, blue:0, alpha:1},1,1,20);
         this.cylinderBlack.initBuffers();
 
-        this.rotationX = 0;
+        this.rotationHandle = 0;
+        this.rotationWheel = 0;
         this.translationX = 0;
     }
 
     handleKeys(elapsed) {
         if (this.app.currentlyPressedKeys['KeyN']) {
-            this.rotationX += 1.0;
+            this.rotationHandle += 1.0;
         }
         if (this.app.currentlyPressedKeys['KeyM']) {
-            this.rotationX -= 1.0;
+            this.rotationHandle -= 1.0;
         }
         if (this.app.currentlyPressedKeys['KeyF']) {
-            this.rotationX += 1.0;
+            this.rotationWheel += 1.0;
         }
         if (this.app.currentlyPressedKeys['KeyG']) {
-            this.rotationX -= 1.0;
+            this.rotationWheel -= 1.0;
         }
     }
 
@@ -92,6 +93,7 @@ export class Scooter {
         // Back wheel
         modelMatrix = this.stack.peekMatrix();
         modelMatrix.translate(-6.2, 0, -0.5);
+        modelMatrix.rotate(this.rotationWheel, 0, 0, 1);
         this.stack.pushMatrix(modelMatrix);
         this.drawWheels(shaderInfo, textureShaderInfo, elapsed, modelMatrix)
         this.stack.popMatrix();
@@ -103,23 +105,26 @@ export class Scooter {
         this.wheel.draw(textureShaderInfo, elapsed, modelMatrix);
     }
     drawHandle(shaderInfo,textureShaderInfo,elapsed,modelMatrix){
+        modelMatrix = this.stack.peekMatrix();
+        modelMatrix.translate(6, 0, 0); // Move to the handle's position first
+        modelMatrix.rotate(this.rotationHandle, 0, 1, 0);
+        this.stack.pushMatrix(modelMatrix);
 
         //long neck
         modelMatrix = this.stack.peekMatrix();
-        modelMatrix.translate(6, 0, 0);
         modelMatrix.scale(0.3, 10, 0.3);
         this.cylinder.draw(shaderInfo,elapsed,modelMatrix);
 
         //base neck
         modelMatrix = this.stack.peekMatrix();
-        modelMatrix.translate(6, -0.2, 0);
+        modelMatrix.translate(0, -0.2, 0);
         modelMatrix.scale(0.5, 3, 0.5);
         this.cylinder.draw(shaderInfo,elapsed,modelMatrix);
 
         //blue handle
         modelMatrix = this.stack.peekMatrix();
         modelMatrix.rotate(90,1,0,0)
-        modelMatrix.translate(6,-3,-10);
+        modelMatrix.translate(0,-3,-10);
         modelMatrix.scale(0.3,6,0.3)
         this.cylinder.draw(shaderInfo,elapsed,modelMatrix);
 
@@ -131,5 +136,12 @@ export class Scooter {
         modelMatrix.translate(0,2.4,0);
         this.cylinderBlack.draw(shaderInfo,elapsed,modelMatrix);
 
+        // Front wheel
+        modelMatrix = this.stack.peekMatrix();
+        modelMatrix.translate(0.2, 0, -0.5);
+        modelMatrix.rotate(this.rotationWheel, 0, 0, 1);
+        this.stack.pushMatrix(modelMatrix);
+        this.drawWheels(shaderInfo, textureShaderInfo, elapsed, modelMatrix)
+        this.stack.popMatrix();
     }
 }
