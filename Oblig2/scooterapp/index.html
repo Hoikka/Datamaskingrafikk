@@ -17,6 +17,9 @@
     NM Roter styre<br>
     FG Roter hjul<br>
     VB Zoom<br>
+    <b>Punktlysets posisjon: <span id="light-position">--</span></b><br>
+    <b>Diffus lysfarge: <span id="diffuse-light-color">--</span></b><br>
+    <b>Ambient lys: <span id="ambient-light">--</span></b><br>
 </div>
 
 <!-- SHADER som håndterer posisjon, farge og tekstur. -->
@@ -43,6 +46,55 @@
     uniform sampler2D uSampler;
     void main() {
         gl_FragColor = texture2D(uSampler, vec2(vTextureCoordinate.s, vTextureCoordinate.t));
+    }
+</script>
+<!-- GOURAD SHADER som håndterer diffust punktlys. -->
+<script id="diffuse-pointlight-gourad-vertex-shader" type="x-shader/x-vertex">
+    attribute vec3 aVertexPosition;
+    attribute vec3 aVertexNormal;    //Normalvektor.
+    attribute vec2 aVertexTextureCoordinate;
+
+    uniform mat4 uModelMatrix;	   //model/world-matrisa brukes til lyskalk.
+    uniform mat3 uNormalMatrix;    //Transformerer normalvektoren vha. denne.
+    uniform mat4 uModelViewMatrix;
+    uniform mat4 uProjectionMatrix;
+
+    uniform vec3 uLightPosition;    //Lysets posisjon.
+    uniform vec3 uAmbientLightColor;
+    uniform vec3 uDiffuseLightColor;
+
+    varying vec3 vLightWeighting;
+    varying lowp vec2 vTextureCoordinate;
+
+    void main() {
+        //Transformer til world-koordinater:
+        vec4 vertexPosition = uModelMatrix * vec4(aVertexPosition, 1.0);
+
+        //Beregn vektoren fra denne verteksen til lyskilden:
+        vec3 vectorToLightSource = normalize(uLightPosition - vec3(vertexPosition));
+
+        //Transformer normalvektoren til world-koordinater:
+        vec3 normal = normalize(uNormalMatrix * aVertexNormal);
+
+        //Beregn prikkprodukt av lysvektor og normalvektor
+        //for diffus belysning:
+        float diffusLightWeightning = max(dot(normal, vectorToLightSource), 0.0);
+
+        //Summer alle refleksjonskomponenter og send til fragmentshader:
+        vLightWeighting = uAmbientLightColor + (uDiffuseLightColor * diffusLightWeightning);
+        vTextureCoordinate = aVertexTextureCoordinate;
+
+        //Transformer vertex:
+        gl_Position = uProjectionMatrix * uModelViewMatrix * vec4(aVertexPosition, 1.0);
+    }
+</script>
+<script id="diffuse-pointlight-gourad-fragment-shader" type="x-shader/x-fragment">
+    precision mediump float;
+    varying vec3 vLightWeighting;
+    varying lowp vec2 vTextureCoordinate;
+    uniform sampler2D uSampler;
+    void main() {
+        gl_FragColor = vec4(vLightWeighting.rgb, 1.0) + texture2D(uSampler, vec2(vTextureCoordinate.s, vTextureCoordinate.t));
     }
 </script>
 
