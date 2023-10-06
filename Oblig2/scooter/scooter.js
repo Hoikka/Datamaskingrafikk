@@ -33,10 +33,10 @@ export class Scooter {
     }
 
     handleKeys(elapsed) {
-        if (this.app.currentlyPressedKeys['KeyN']) {
+        if (this.app.currentlyPressedKeys['KeyN'] && this.rotationHandle < 45) {
             this.rotationHandle += 1.0;
         }
-        if (this.app.currentlyPressedKeys['KeyM']) {
+        if (this.app.currentlyPressedKeys['KeyM'] && this.rotationHandle > -45) {
             this.rotationHandle -= 1.0;
         }
         if (this.app.currentlyPressedKeys['KeyF']) {
@@ -73,7 +73,7 @@ export class Scooter {
         modelMatrix = this.stack.peekMatrix();
         modelMatrix.translate(5, 1, 0);
         modelMatrix.rotate(45, 0, 0, 1);
-        modelMatrix.scale(1, 0.5, 0.5);
+        modelMatrix.scale(1.5, 0.5, 0.5);
         this.bodyPart.draw(textureShaderInfo, elapsed, modelMatrix);
 
         // Back body element
@@ -91,7 +91,7 @@ export class Scooter {
 
         // Back wheel
         modelMatrix = this.stack.peekMatrix();
-        modelMatrix.translate(-6.2, 0, -0.5);
+        modelMatrix.translate(-5.5, 0, -0.5);
         modelMatrix.rotate(this.rotationWheel, 0, 0, 1);
         this.stack.pushMatrix(modelMatrix);
         this.drawWheels(shaderInfo, textureShaderInfo, elapsed, modelMatrix)
@@ -105,7 +105,8 @@ export class Scooter {
     }
     drawHandle(shaderInfo,textureShaderInfo,elapsed,modelMatrix){
         modelMatrix = this.stack.peekMatrix();
-        modelMatrix.translate(6, 0, 0); // Move to the handle's position first
+        modelMatrix.translate(6.5, 0, 0); // Move to the handle's position first
+        modelMatrix.rotate(15, 0, 0, 1);
         modelMatrix.rotate(this.rotationHandle, 0, 1, 0);
         this.stack.pushMatrix(modelMatrix);
 
