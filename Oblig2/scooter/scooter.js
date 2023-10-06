@@ -22,7 +22,7 @@ export class Scooter {
         this.wheel = new Wheel(app);
         this.wheel.initBuffers();
 
-        this.cylinder = new Cylinder(app,{red:0, green:0.0, blue:1, alpha:1},1,1,20);
+        this.cylinder = new CylinderTexture(app,{red:0, green:0.0, blue:1, alpha:1},1,1,20);
         this.cylinder.initBuffers();
 
         this.cylinderBlack = new Cylinder(app,{red:0, green:0, blue:0, alpha:1},1,1,20);
@@ -30,7 +30,6 @@ export class Scooter {
 
         this.rotationHandle = 0;
         this.rotationWheel = 0;
-        this.translationX = 0;
     }
 
     handleKeys(elapsed) {
@@ -113,20 +112,20 @@ export class Scooter {
         //long neck
         modelMatrix = this.stack.peekMatrix();
         modelMatrix.scale(0.3, 10, 0.3);
-        this.cylinder.draw(shaderInfo,elapsed,modelMatrix);
+        this.cylinder.draw(textureShaderInfo,elapsed,modelMatrix);
 
         //base neck
         modelMatrix = this.stack.peekMatrix();
         modelMatrix.translate(0, -0.2, 0);
         modelMatrix.scale(0.5, 3, 0.5);
-        this.cylinder.draw(shaderInfo,elapsed,modelMatrix);
+        this.cylinder.draw(textureShaderInfo,elapsed,modelMatrix);
 
         //blue handle
         modelMatrix = this.stack.peekMatrix();
         modelMatrix.rotate(90,1,0,0)
         modelMatrix.translate(0,-3,-10);
         modelMatrix.scale(0.3,6,0.3)
-        this.cylinder.draw(shaderInfo,elapsed,modelMatrix);
+        this.cylinder.draw(textureShaderInfo,elapsed,modelMatrix);
 
         //black handle (left)
         modelMatrix.scale(1.1,0.3,1.1);

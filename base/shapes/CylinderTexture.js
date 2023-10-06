@@ -22,42 +22,33 @@ export class CylinderTexture extends BaseShape {
         let toPI = 2 * Math.PI;
         let step = toPI / this.sectors;
 
-        // Bottom circle:
+        // Bottom circle (Rim):
         this.positions.push(0, 0, 0);
-        this.texCoords.push(0.5, 0.5);
         for (let phi = 0.0; phi <= toPI; phi += step) {
             let x = this.radius * Math.cos(phi);
             let z = this.radius * Math.sin(phi);
-
             this.positions.push(x, 0, z);
-            this.texCoords.push(0.5 + 0.5 * Math.cos(phi), 0.5 + 0.5 * Math.sin(phi));
         }
 
-        // Top circle:
+        // Top circle (Rim):
         this.positions.push(0, this.height, 0);
-        this.texCoords.push(0.5, 0.5);
         for (let phi = 0.0; phi <= toPI; phi += step) {
             let x = this.radius * Math.cos(phi);
             let z = this.radius * Math.sin(phi);
-
             this.positions.push(x, this.height, z);
-            this.texCoords.push(0.5 + 0.5 * Math.cos(phi), 0.5 + 0.5 * Math.sin(phi));
         }
 
-        // Sides of the cylinder:
+        // Sides of the cylinder (Tire):
         for (let i = 0; i <= this.sectors; i++) {
             let theta = 2 * Math.PI * i / this.sectors;
             let x = this.radius * Math.cos(theta);
             let z = this.radius * Math.sin(theta);
-            let u = i / this.sectors;
 
             // Bottom vertex
             this.positions.push(x, 0, z);
-            this.texCoords.push(u, 0);
 
             // Top vertex
             this.positions.push(x, this.height, z);
-            this.texCoords.push(u, 1);
         }
     }
 
@@ -77,27 +68,66 @@ export class CylinderTexture extends BaseShape {
 
     setTextureCoordinates() {
         this.textureCoordinates = [];
-        // TODO: Define the texture coordinates for the cylinder here.
+        let toPI = 2 * Math.PI;
+        let step = toPI / this.sectors;
+
+        // Bottom circle:
+        this.textureCoordinates.push(0., 0.2);
+        for (let phi = 0.0; phi <= toPI; phi += step) {
+            this.textureCoordinates.push(0.0 + 0.2 * Math.cos(phi), 0.0 + 0.2 * Math.sin(phi));
+        }
+
+        // Top circle:
+        this.textureCoordinates.push(0.0, 0.2);
+        for (let phi = 0.0; phi <= toPI; phi += step) {
+            this.textureCoordinates.push(0.0 + 0.2 * Math.cos(phi), 0.0 + 0.2 * Math.sin(phi));
+        }
+
+        // Sides of the cylinder:
+        for (let i = 0; i <= this.sectors; i++) {
+            let u = i / this.sectors;
+
+            // Bottom vertex (at the base of the cylinder)
+            this.textureCoordinates.push(u, 0.3);
+
+            // Top vertex (at the top of the cylinder)
+            this.textureCoordinates.push(u, 0.7);
+        }
     }
 
+
     initTextures() {
-        const textureUrls = ['./../../base/textures/wheelTexture-1.png'];
-        let imageLoader = new ImageLoader();
-        imageLoader.load((textureImages) => {
-            const textureImage = textureImages[0];
-            if (isPowerOfTwo1(textureImage.width) && isPowerOfTwo1(textureImage.height)) {
-                this.rectangleTexture = this.gl.createTexture();
-                this.gl.bindTexture(this.gl.TEXTURE_2D, this.rectangleTexture);
-                this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, true);
-                this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, textureImage);
-                this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.NEAREST);
-                this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST);
-                this.gl.bindTexture(this.gl.TEXTURE_2D, null);
-                this.buffers.texture = this.gl.createBuffer();
-                this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.buffers.texture);
-                this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.textureCoordinates), this.gl.STATIC_DRAW);
-            }
-        }, textureUrls);
+        const textureUrls = ['./../../base/textures/metal1.png'];
+        if (this.textureCoordinates.length > 0) {
+            //Laster textureUrls...
+            let imageLoader = new ImageLoader();
+            imageLoader.load((textureImages) => {
+                    const textureImage = textureImages[0];
+                    if (isPowerOfTwo1(textureImage.width) && isPowerOfTwo1(textureImage.height)) {
+                        this.cylinderTexture = this.gl.createTexture();
+                        //Teksturbildet er nå lastet fra server, send til GPU:
+                        this.gl.bindTexture(this.gl.TEXTURE_2D, this.cylinderTexture);
+
+                        //Unngaa at bildet kommer opp-ned:
+                        this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, true);
+                        this.gl.pixelStorei(this.gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);   //NB! FOR GJENNOMSIKTIG BAKGRUNN!! Sett også this.gl.blendFunc(this.gl.ONE, this.gl.ONE_MINUS_SRC_ALPHA);
+
+                        //Laster teksturbildet til GPU/shader:
+                        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, textureImage);
+
+                        //Teksturparametre:
+                        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.NEAREST);
+                        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST);
+
+                        this.gl.bindTexture(this.gl.TEXTURE_2D, null);
+
+                        this.buffers.texture = this.gl.createBuffer();
+                        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.buffers.texture);
+                        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.textureCoordinates), this.gl.STATIC_DRAW);
+                    }
+                },
+                textureUrls);
+        }
     }
 
     handleKeys(elapsed) {
@@ -111,7 +141,7 @@ export class CylinderTexture extends BaseShape {
         super.draw(shaderInfo, elapsed, modelMatrix);
 
         // Assuming you have set up texture in your shader and BaseShape
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture);
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this.cylinderTexture);
 
         // Draw bottom circle:
         this.gl.drawArrays(this.gl.TRIANGLE_FAN, 0, this.sectors + 2);

@@ -104,9 +104,9 @@ export class Wheel extends BaseShape {
             imageLoader.load((textureImages) => {
                     const textureImage = textureImages[0];
                     if (isPowerOfTwo1(textureImage.width) && isPowerOfTwo1(textureImage.height)) {
-                        this.rectangleTexture = this.gl.createTexture();
+                        this.wheelTexture = this.gl.createTexture();
                         //Teksturbildet er nå lastet fra server, send til GPU:
-                        this.gl.bindTexture(this.gl.TEXTURE_2D, this.rectangleTexture);
+                        this.gl.bindTexture(this.gl.TEXTURE_2D, this.wheelTexture);
 
                         //Unngaa at bildet kommer opp-ned:
                         this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, true);
@@ -145,7 +145,7 @@ export class Wheel extends BaseShape {
         super.draw(shaderInfo, elapsed, modelMatrix);
 
         // Assuming you have set up texture in your shader and BaseShape
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture);
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this.wheelTexture);
 
         // Draw bottom circle:
         this.gl.drawArrays(this.gl.TRIANGLE_FAN, 0, this.sectors + 2);
