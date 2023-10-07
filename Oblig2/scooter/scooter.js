@@ -24,7 +24,7 @@ export class Scooter {
         this.cylinder = new CylinderTexture(app,{red:0, green:0.0, blue:1, alpha:1},1,1);
         this.cylinder.initBuffers();
 
-        this.cylinderBlack = new Cylinder(app,{red:0, green:0, blue:0, alpha:1},1,1,20);
+        this.cylinderBlack = new CylinderTexture(app,{red:1, green:0, blue:0, alpha:1},1,1);
         this.cylinderBlack.initBuffers();
 
         this.rotationHandle = 0;
@@ -126,8 +126,9 @@ export class Scooter {
 
         // Back wheel
         modelMatrix = this.stack.peekMatrix();
-        modelMatrix.translate(-5.5, 0, -0.5);
+        modelMatrix.translate(-5.5, 0, -1);
         modelMatrix.rotate(this.rotationWheel, 0, 0, 1);
+        modelMatrix.rotate(90,1,0,0)
         this.stack.pushMatrix(modelMatrix);
         this.drawWheels(textureLightShaderInfo, elapsed, modelMatrix)
         this.stack.popMatrix();
@@ -177,8 +178,9 @@ export class Scooter {
 
         // Front wheel
         modelMatrix = this.stack.peekMatrix();
-        modelMatrix.translate(0.2, 0, -0.5);
+        modelMatrix.translate(0, 0, -1);
         modelMatrix.rotate(this.rotationWheel, 0, 0, 1);
+        modelMatrix.rotate(90,1,0,0)
         this.stack.pushMatrix(modelMatrix);
         this.drawWheels(textureLightShaderInfo, elapsed, modelMatrix)
         this.stack.popMatrix();
