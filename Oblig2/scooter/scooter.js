@@ -18,7 +18,7 @@ export class Scooter {
         this.bodyPart = new CubeTextured(app, {red:0.8, green:0.0, blue:0.6, alpha:1}, false);
         this.bodyPart.initBuffers();
 
-        this.wheel = new Wheel(app);
+        this.wheel = new Wheel(app,{red:0, green:0.0, blue:0, alpha:1});
         this.wheel.initBuffers();
 
         this.cylinder = new CylinderTexture(app,{red:0, green:0.0, blue:1, alpha:1},1,1);
@@ -129,11 +129,11 @@ export class Scooter {
         modelMatrix.translate(-5.5, 0, -0.5);
         modelMatrix.rotate(this.rotationWheel, 0, 0, 1);
         this.stack.pushMatrix(modelMatrix);
-        //this.drawWheels(textureLightShaderInfo, elapsed, modelMatrix)
+        this.drawWheels(textureLightShaderInfo, elapsed, modelMatrix)
         this.stack.popMatrix();
     }
 
-    drawWheels(shaderInfo, textureLightShaderInfo, elapsed, modelMatrix){
+    drawWheels(textureLightShaderInfo, elapsed, modelMatrix){
         //this.initLight(textureLightShaderInfo);
 
         modelMatrix = this.stack.peekMatrix();
@@ -180,7 +180,7 @@ export class Scooter {
         modelMatrix.translate(0.2, 0, -0.5);
         modelMatrix.rotate(this.rotationWheel, 0, 0, 1);
         this.stack.pushMatrix(modelMatrix);
-        //this.drawWheels(textureLightShaderInfo, elapsed, modelMatrix)
+        this.drawWheels(textureLightShaderInfo, elapsed, modelMatrix)
         this.stack.popMatrix();
     }
 }
