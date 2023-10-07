@@ -5,7 +5,6 @@
 import {Stack} from "../../base/helpers/Stack.js";
 import {CylinderTexture} from "../../base/shapes/CylinderTexture.js";
 import {CubeTextured} from "../../base/shapes/CubeTextured.js";
-import {Cube} from "../../base/shapes/Cube.js";
 import {Cylinder} from "../../base/shapes/Cylinder.js";
 import {Wheel} from "../../base/shapes/Wheel.js";
 
@@ -130,11 +129,13 @@ export class Scooter {
         modelMatrix.translate(-5.5, 0, -0.5);
         modelMatrix.rotate(this.rotationWheel, 0, 0, 1);
         this.stack.pushMatrix(modelMatrix);
-        this.drawWheels(textureLightShaderInfo, elapsed, modelMatrix)
+        //this.drawWheels(textureLightShaderInfo, elapsed, modelMatrix)
         this.stack.popMatrix();
     }
 
     drawWheels(shaderInfo, textureLightShaderInfo, elapsed, modelMatrix){
+        //this.initLight(textureLightShaderInfo);
+
         modelMatrix = this.stack.peekMatrix();
 
         this.wheel.draw(textureLightShaderInfo, elapsed, modelMatrix);
@@ -180,7 +181,7 @@ export class Scooter {
         modelMatrix.translate(0.2, 0, -0.5);
         modelMatrix.rotate(this.rotationWheel, 0, 0, 1);
         this.stack.pushMatrix(modelMatrix);
-        this.drawWheels(shaderInfo, textureLightShaderInfo, elapsed, modelMatrix)
+        //this.drawWheels(textureLightShaderInfo, elapsed, modelMatrix)
         this.stack.popMatrix();
     }
 }

@@ -11,9 +11,11 @@ export class CylinderTexture extends BaseShape {
         this.height = height;
         this.radius = radius;
         this.rotation = 0;
+        this.normals = [];
         this.createVertices();
         this.setTextureCoordinates();
         this.setColors();
+        this.initNormals();
         this.initTextures();
     }
 
@@ -24,6 +26,7 @@ export class CylinderTexture extends BaseShape {
 
         // Bottom circle (Rim):
         this.positions.push(0, 0, 0);
+        this.normals.push(0, -1, 0);
         for (let phi = 0.0; phi <= toPI; phi += step) {
             let x = this.radius * Math.cos(phi);
             let z = this.radius * Math.sin(phi);
@@ -32,6 +35,7 @@ export class CylinderTexture extends BaseShape {
 
         // Top circle (Rim):
         this.positions.push(0, this.height, 0);
+        this.normals.push(0, 1, 0);
         for (let phi = 0.0; phi <= toPI; phi += step) {
             let x = this.radius * Math.cos(phi);
             let z = this.radius * Math.sin(phi);
@@ -43,13 +47,23 @@ export class CylinderTexture extends BaseShape {
             let theta = 2 * Math.PI * i / this.sectors;
             let x = this.radius * Math.cos(theta);
             let z = this.radius * Math.sin(theta);
+            let nx = Math.cos(theta);
+            let nz = Math.sin(theta);
 
             // Bottom vertex
             this.positions.push(x, 0, z);
+            this.normals.push(nx, 0, nz);
 
             // Top vertex
             this.positions.push(x, this.height, z);
+            this.normals.push(nx, 0, nz);
         }
+    }
+
+    initNormals() {
+        this.normalBuffer = this.gl.createBuffer();
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.normalBuffer);
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.normals), this.gl.STATIC_DRAW);
     }
 
     setColors() {
@@ -74,13 +88,13 @@ export class CylinderTexture extends BaseShape {
         // Bottom circle:
         this.textureCoordinates.push(0., 0.2);
         for (let phi = 0.0; phi <= toPI; phi += step) {
-            this.textureCoordinates.push(0.0 + 0.2 * Math.cos(phi), 0.0 + 0.2 * Math.sin(phi));
+            this.textureCoordinates.push(0.2 * Math.cos(phi), 0.2 * Math.sin(phi));
         }
 
         // Top circle:
         this.textureCoordinates.push(0.0, 0.2);
         for (let phi = 0.0; phi <= toPI; phi += step) {
-            this.textureCoordinates.push(0.0 + 0.2 * Math.cos(phi), 0.0 + 0.2 * Math.sin(phi));
+            this.textureCoordinates.push(0.2 * Math.cos(phi), 0.2 * Math.sin(phi));
         }
 
         // Sides of the cylinder:
@@ -94,6 +108,23 @@ export class CylinderTexture extends BaseShape {
             this.textureCoordinates.push(u, 0.7);
         }
     }
+
+    connectNormalAttribute(gl, shader, normalBuffer) {
+        const numComponents = 3;
+        const type = gl.FLOAT;
+        const normalize = false;
+        const stride = 0;
+        const offset = 0;
+        gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+        gl.vertexAttribPointer(
+            shader.attribLocations.vertexNormal,
+            numComponents,
+            type,
+            normalize,
+            stride,
+            offset);
+        gl.enableVertexAttribArray(shader.attribLocations.vertexNormal);
+    };
 
 
     initTextures() {
@@ -134,13 +165,15 @@ export class CylinderTexture extends BaseShape {
         // Rotate the texture by modifying the texture coordinates
         this.rotation += elapsed * 0.01; // adjust the speed as needed
         this.setTextureCoordinates(); // recompute the texture coordinates based on the new rotation angle
-        // You might also want to update the buffer
     }
 
     draw(shaderInfo, elapsed, modelMatrix = (new Matrix4()).setIdentity()) {
         super.draw(shaderInfo, elapsed, modelMatrix);
 
-        // Assuming you have set up texture in your shader and BaseShape
+        // Bind the normal buffer.
+        this.connectNormalAttribute(this.gl, shaderInfo, this.normalBuffer);
+
+        // Bind the texture
         this.gl.bindTexture(this.gl.TEXTURE_2D, this.cylinderTexture);
 
         // Draw bottom circle:

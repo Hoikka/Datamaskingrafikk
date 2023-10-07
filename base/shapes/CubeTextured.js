@@ -13,9 +13,6 @@ export class CubeTextured extends BaseShape {
         this.color = color;
         this.wireFrame = wireFrame;
         this.initNormals();
-        this.normalBuffer = this.gl.createBuffer();
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.normalBuffer);
-        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.normals), this.gl.STATIC_DRAW);
     }
 
     setPositions() {
@@ -215,9 +212,6 @@ export class CubeTextured extends BaseShape {
         gl.enableVertexAttribArray(shader.attribLocations.vertexNormal);
     };
 
-    setLightUniforms(shaderInfo) {
-        this.gl.uniform3f(shaderInfo.uniformLocations.lightPosition, this.app.textureLightShaderInfo.light.lightPosition.x, this.app.textureLightShaderInfo.light.lightPosition.y, this.app.textureLightShaderInfo.light.lightPosition.z);
-    }
 
     /**
      * Denne kalles fra initBuffers() i BaseShape.
@@ -266,9 +260,6 @@ export class CubeTextured extends BaseShape {
 
         // Bind the normal buffer.
         this.connectNormalAttribute(this.gl, shaderInfo, this.normalBuffer);
-
-        // Set the light uniforms.
-        this.setLightUniforms(shaderInfo);
 
         if (this.wireFrame) {
             this.gl.drawArrays(this.gl.LINE_STRIP, 0, this.vertexCount);

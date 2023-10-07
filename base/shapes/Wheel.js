@@ -138,11 +138,11 @@ export class Wheel extends BaseShape {
     }
 
     draw(shaderInfo, elapsed, modelMatrix = (new Matrix4()).setIdentity()) {
-        // Apply the desired transformations
+        super.draw(shaderInfo, elapsed, modelMatrix);
+
+        // Apply transformations
         modelMatrix.rotate(90, 1, 0, 0);
         modelMatrix.scale(1, 0.5, 1);
-
-        super.draw(shaderInfo, elapsed, modelMatrix);
 
         // Assuming you have set up texture in your shader and BaseShape
         this.gl.bindTexture(this.gl.TEXTURE_2D, this.wheelTexture);
