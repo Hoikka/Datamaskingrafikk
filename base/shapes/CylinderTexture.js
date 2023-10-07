@@ -12,6 +12,7 @@ export class CylinderTexture extends BaseShape {
         this.radius = radius;
         this.rotation = 0;
         this.normals = [];
+        
         this.createVertices();
         this.setTextureCoordinates();
         this.setColors();
@@ -63,7 +64,7 @@ export class CylinderTexture extends BaseShape {
     initNormals() {
         this.normalBuffer = this.gl.createBuffer();
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.normalBuffer);
-        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.normals), this.gl.STATIC_DRAW);
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.positions), this.gl.STATIC_DRAW);
     }
 
     setColors() {
