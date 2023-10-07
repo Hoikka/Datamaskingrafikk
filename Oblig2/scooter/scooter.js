@@ -170,11 +170,11 @@ export class Scooter {
 
         //black handle (left)
         modelMatrix.scale(1.1,0.3,1.1);
-        this.cylinderBlack.draw(shaderInfo,elapsed,modelMatrix);
+        this.cylinderBlack.draw(textureLightShaderInfo,elapsed,modelMatrix);
 
         //black handle (right)
         modelMatrix.translate(0,2.4,0);
-        this.cylinderBlack.draw(shaderInfo,elapsed,modelMatrix);
+        this.cylinderBlack.draw(textureLightShaderInfo,elapsed,modelMatrix);
 
         // Front wheel
         modelMatrix = this.stack.peekMatrix();
