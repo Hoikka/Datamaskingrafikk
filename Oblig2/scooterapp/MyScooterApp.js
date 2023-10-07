@@ -39,9 +39,9 @@ export class MyScooterApp extends BaseApp {
             },
         };
         this.light = {
-            lightPosition: {x: 8, y:8, z:0},
-            diffuseLightColor: {r: 1, g: 1, b: 1},
-            ambientLightColor: {r: 0.5, g: 0.5, b:0.5},
+            lightPosition: {x: 8, y:0, z:10},
+            diffuseLightColor: {r: 1, g: 0, b: 0},
+            ambientLightColor: {r: 0, g: 0, b:1},
         };
         this.textureLightShaderInfo.light = this.light;
 

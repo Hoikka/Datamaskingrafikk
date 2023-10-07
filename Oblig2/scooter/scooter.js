@@ -57,11 +57,6 @@ export class Scooter {
         // Activate the shader for the object:
         gl.useProgram(textureLightShaderInfo.program);
 
-        // Set light position:
-        gl.uniform3f(
-            textureLightShaderInfo.uniformLocations.lightPosition,
-            lightInfo.lightPosition.x, lightInfo.lightPosition.y, lightInfo.lightPosition.z
-        );
 
         // Set ambient light color:
         gl.uniform3f(
@@ -74,6 +69,11 @@ export class Scooter {
             textureLightShaderInfo.uniformLocations.diffuseLightColor,
             lightInfo.diffuseLightColor.r, lightInfo.diffuseLightColor.g, lightInfo.diffuseLightColor.b
         );
+        // Set light position:
+        gl.uniform3f(
+            textureLightShaderInfo.uniformLocations.lightPosition,
+            lightInfo.lightPosition.x, lightInfo.lightPosition.y, lightInfo.lightPosition.z
+        );
     }
 
 
@@ -82,14 +82,17 @@ export class Scooter {
     }
 
     drawScooter(shaderInfo, textureLightShaderInfo, elapsed, modelMatrix = (new Matrix4()).setIdentity()) {
-        this.initLight(textureLightShaderInfo);
-
+        // Beregner og sender inn matrisa som brukes til å transformere normalvektorene:
+        let normalMatrix = mat3.create();
+        // Send normalmatrisa til shaderen (merk: 3x3):
+	    mat3.normalFromMat4(normalMatrix, modelMatrix.elements);
+        this.app.gl.uniformMatrix3fv(textureLightShaderInfo.uniformLocations.normalMatrix, false, normalMatrix);
         modelMatrix.translate(0, 1, 0);  // Starter med å sette x-aksen som nullpunkt
         this.stack.pushMatrix(modelMatrix);
         modelMatrix = this.stack.peekMatrix(modelMatrix);
 
         this.drawPlatform(shaderInfo, textureLightShaderInfo, elapsed, modelMatrix);
-        //this.drawHandle(shaderInfo, textureLightShaderInfo, elapsed,modelMatrix);
+        this.drawHandle(shaderInfo, textureLightShaderInfo, elapsed,modelMatrix);
 
     }
 
@@ -127,7 +130,7 @@ export class Scooter {
         modelMatrix.translate(-5.5, 0, -0.5);
         modelMatrix.rotate(this.rotationWheel, 0, 0, 1);
         this.stack.pushMatrix(modelMatrix);
-        //this.drawWheels(textureLightShaderInfo, elapsed, modelMatrix)
+        this.drawWheels(textureLightShaderInfo, elapsed, modelMatrix)
         this.stack.popMatrix();
     }
 
