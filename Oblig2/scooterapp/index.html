@@ -22,53 +22,27 @@
     <b>Ambient lys: <span id="ambient-light">--</span></b><br>
 </div>
 
-<!-- SHADER som håndterer posisjon, farge og tekstur. -->
-<script id="texture-vertex-shader" type="x-shader/x-vertex">
+<!-- SHADER som håndterer posisjon, farge, tekstur og belysning. -->
+<script id="combined-vertex-shader" type="x-shader/x-vertex">
     attribute vec4 aVertexPosition;
     attribute vec4 aVertexColor;
     attribute vec2 aVertexTextureCoordinate;
-    uniform mat4 uModelViewMatrix;
-    uniform mat4 uProjectionMatrix;
-
-    varying lowp vec2 vTextureCoordinate;
-    varying lowp vec4 vColor;
-    void main() {
-        gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
-        vTextureCoordinate = aVertexTextureCoordinate;
-        vColor = aVertexColor;
-        gl_PointSize = 10.0;    //Merk: Kun i bruk når man tegner POINTS
-    }
-</script>
-
-<script id="texture-fragment-shader" type="x-shader/x-fragment">
-    varying lowp vec4 vColor;
-    varying lowp vec2 vTextureCoordinate;
-    uniform sampler2D uSampler;
-    void main() {
-        gl_FragColor = texture2D(uSampler, vec2(vTextureCoordinate.s, vTextureCoordinate.t));
-    }
-</script>
-<!-- GOURAD SHADER som håndterer diffust punktlys. -->
-<script id="diffuse-pointlight-gourad-vertex-shader" type="x-shader/x-vertex">
-    attribute vec3 aVertexPosition;
     attribute vec3 aVertexNormal;    //Normalvektor.
-    attribute vec2 aVertexTextureCoordinate;
 
-    uniform mat4 uModelMatrix;	   //model/world-matrisa brukes til lyskalk.
-    uniform mat3 uNormalMatrix;    //Transformerer normalvektoren vha. denne.
     uniform mat4 uModelViewMatrix;
     uniform mat4 uProjectionMatrix;
-
+    uniform mat4 uModelMatrix;
+    uniform mat3 uNormalMatrix;
     uniform vec3 uLightPosition;    //Lysets posisjon.
     uniform vec3 uAmbientLightColor;
     uniform vec3 uDiffuseLightColor;
 
-    varying vec3 vLightWeighting;
     varying lowp vec2 vTextureCoordinate;
+    varying lowp vec4 vColor;
+    varying vec3 vLightWeighting;
 
     void main() {
-        //Transformer til world-koordinater:
-        vec4 vertexPosition = uModelMatrix * vec4(aVertexPosition, 1.0);
+        vec4 vertexPosition = uModelMatrix * aVertexPosition;
 
         //Beregn vektoren fra denne verteksen til lyskilden:
         vec3 vectorToLightSource = normalize(uLightPosition - vec3(vertexPosition));
@@ -81,21 +55,29 @@
         float diffusLightWeightning = max(dot(normal, vectorToLightSource), 0.0);
 
         //Summer alle refleksjonskomponenter og send til fragmentshader:
-        vLightWeighting = uAmbientLightColor + (uDiffuseLightColor * diffusLightWeightning);
+        vLightWeighting = uAmbientLightColor + uDiffuseLightColor * diffusLightWeightning;
         vTextureCoordinate = aVertexTextureCoordinate;
 
         //Transformer vertex:
-        gl_Position = uProjectionMatrix * uModelViewMatrix * vec4(aVertexPosition, 1.0);
+        gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
     }
 </script>
-<script id="diffuse-pointlight-gourad-fragment-shader" type="x-shader/x-fragment">
+
+<script id="combined-fragment-shader" type="x-shader/x-fragment">
     precision mediump float;
-    varying vec3 vLightWeighting;
+
+    varying lowp vec4 vColor;
     varying lowp vec2 vTextureCoordinate;
+    varying vec3 vLightWeighting;
+
     uniform sampler2D uSampler;
+
     void main() {
-        gl_FragColor = vec4(vLightWeighting.rgb, 1.0) + texture2D(uSampler, vec2(vTextureCoordinate.s, vTextureCoordinate.t));
+        vec4 texelColor = texture2D(uSampler, vTextureCoordinate);
+        gl_FragColor = vec4(texelColor.rgb * vLightWeighting, texelColor.a);
     }
+</script>
+
 </script>
 
 <script type="module" >
