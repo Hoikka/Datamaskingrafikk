@@ -4,7 +4,7 @@ import {ImageLoader} from "../helpers/ImageLoader.js";
 import {isPowerOfTwo1} from "../lib/utility-functions.js";
 
 export class Wheel extends BaseShape {
-    constructor(app, color = {red:0.8, green:0.0, blue:0.6, alpha:1}, height=0.4, radius =1.0, sectors=36) {
+    constructor(app, color = {red:0.8, green:0.0, blue:0.6, alpha:1}, height=0.4, radius =1.0, sectors=16) {
         super(app);
         this.color = color;
         this.sectors = sectors;
@@ -44,7 +44,7 @@ export class Wheel extends BaseShape {
         const majorRadius = this.radius;  // R
         const minorRadius = this.radius * 0.2; // Adjust as desired
         const slices = this.sectors;
-        const stacks = this.sectors;  // You can change this if you want more/less granularity in the torus
+        const stacks = 60;  // You can change this if you want more/less granularity in the torus
 
         for (let slice = 0; slice <= slices; slice++) {
             const slice_angle = (slice / slices) * 2 * Math.PI; // u
@@ -126,7 +126,7 @@ export class Wheel extends BaseShape {
 
         // Sides of the cylinder (Tire):
         const slices = this.sectors;
-        const stacks = this.sectors;
+        const stacks = 60;
         const vStart = 0.73633;
         const vEnd = 1;
 
