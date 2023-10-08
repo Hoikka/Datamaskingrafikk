@@ -11,8 +11,7 @@ export class CylinderTexture extends BaseShape {
         this.height = height;
         this.radius = radius;
         this.rotation = 0;
-        this.normals = [];
-        
+
         this.createVertices();
         this.setTextureCoordinates();
         this.setColors();
@@ -27,7 +26,6 @@ export class CylinderTexture extends BaseShape {
 
         // Bottom circle (Rim):
         this.positions.push(0, 0, 0);
-        this.normals.push(0, -1, 0);
         for (let phi = 0.0; phi <= toPI; phi += step) {
             let x = this.radius * Math.cos(phi);
             let z = this.radius * Math.sin(phi);
@@ -36,7 +34,6 @@ export class CylinderTexture extends BaseShape {
 
         // Top circle (Rim):
         this.positions.push(0, this.height, 0);
-        this.normals.push(0, 1, 0);
         for (let phi = 0.0; phi <= toPI; phi += step) {
             let x = this.radius * Math.cos(phi);
             let z = this.radius * Math.sin(phi);
@@ -48,16 +45,12 @@ export class CylinderTexture extends BaseShape {
             let theta = 2 * Math.PI * i / this.sectors;
             let x = this.radius * Math.cos(theta);
             let z = this.radius * Math.sin(theta);
-            let nx = Math.cos(theta);
-            let nz = Math.sin(theta);
 
             // Bottom vertex
             this.positions.push(x, 0, z);
-            this.normals.push(nx, 0, nz);
 
             // Top vertex
             this.positions.push(x, this.height, z);
-            this.normals.push(nx, 0, nz);
         }
     }
 

@@ -11,7 +11,7 @@ export class Wheel extends BaseShape {
         this.height = height;
         this.radius = radius;
         this.rotation = 0;
-        this.normals=[];
+
         this.createVertices();
         this.setTextureCoordinates();
         this.setColors();
@@ -26,7 +26,6 @@ export class Wheel extends BaseShape {
 
         // Bottom circle (Rim):
         this.positions.push(0, 0, 0);
-        this.normals.push(0, -1, 0);
         for (let phi = 0.0; phi <= toPI; phi += step) {
             let x = this.radius * Math.cos(phi);
             let z = this.radius * Math.sin(phi);
@@ -35,7 +34,6 @@ export class Wheel extends BaseShape {
 
         // Top circle (Rim):
         this.positions.push(0, this.height, 0);
-        this.normals.push(0, 1, 0);
         for (let phi = 0.0; phi <= toPI; phi += step) {
             let x = this.radius * Math.cos(phi);
             let z = this.radius * Math.sin(phi);
@@ -43,20 +41,24 @@ export class Wheel extends BaseShape {
         }
 
         // Sides of the cylinder (Tire):
-        for (let i = 0; i <= this.sectors; i++) {
-            let theta = 2 * Math.PI * i / this.sectors;
-            let x = this.radius * Math.cos(theta);
-            let z = this.radius * Math.sin(theta);
-            let nx = Math.cos(theta);
-            let nz = Math.sin(theta);
+        // Parameters for the torus
+        const majorRadius = this.radius;  // R
+        const minorRadius = this.radius * 0.2; // Adjust as desired
+        const slices = this.sectors;
+        const stacks = this.sectors;  // You can change this if you want more/less granularity in the torus
 
-            // Bottom vertex
-            this.positions.push(x, 0, z);
-            this.normals.push(nx, 0, nz);
+        for (let slice = 0; slice <= slices; slice++) {
+            const slice_angle = (slice / slices) * 2 * Math.PI; // u
 
-            // Top vertex
-            this.positions.push(x, this.height, z);
-            this.normals.push(nx, 0, nz);
+            for (let stack = 0; stack <= stacks; stack++) {
+                const stack_angle = (stack / stacks) * 2 * Math.PI; // v
+
+                const x = (majorRadius + minorRadius * Math.cos(stack_angle)) * Math.cos(slice_angle);
+                const y = minorRadius * Math.sin(stack_angle);
+                const z = (majorRadius + minorRadius * Math.cos(stack_angle)) * Math.sin(slice_angle);
+
+                this.positions.push(x, y, z);
+            }
         }
     }
 
@@ -65,6 +67,7 @@ export class Wheel extends BaseShape {
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.normalBuffer);
         this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.positions), this.gl.STATIC_DRAW);
     }
+
     connectNormalAttribute(gl, shader, normalBuffer) {
         const numComponents = 3;
         const type = gl.FLOAT;
@@ -101,14 +104,17 @@ export class Wheel extends BaseShape {
         }
 
         // Sides of the cylinder (Tire):
-        for (let i = 0; i <= this.sectors; i++) {
-            let u = i / this.sectors;
+        const slices = this.sectors;
+        const stacks = this.sectors;
 
-            // Bottom vertex
-            this.textureCoordinates.push(u, 0.73633);
+        for (let slice = 0; slice <= slices; slice++) {
+            const u = slice / slices;
 
-            // Top vertex
-            this.textureCoordinates.push(u, 1);
+            for (let stack = 0; stack <= stacks; stack++) {
+                const v = 0.73633 + (stack / stacks) * (1 - 0.73633);
+
+                this.textureCoordinates.push(u, v);
+            }
         }
     }
 
@@ -177,7 +183,7 @@ export class Wheel extends BaseShape {
         modelMatrix.rotate(90, 1, 0, 0);
         modelMatrix.scale(1, 0.5, 1);
 
-        // Assuming you have set up texture in your shader and BaseShape
+        // Bind texture
         this.gl.bindTexture(this.gl.TEXTURE_2D, this.wheelTexture);
 
         // Draw bottom circle:
@@ -185,8 +191,12 @@ export class Wheel extends BaseShape {
         // Draw top circle:
         let offset = (this.sectors + 2);
         this.gl.drawArrays(this.gl.TRIANGLE_FAN, offset, this.sectors + 2);
+
         // Draw the sides:
         offset += (this.sectors + 2);
-        this.gl.drawArrays(this.gl.TRIANGLE_STRIP, offset, 2 * (this.sectors + 1));
+        for (let slice = 0; slice < this.sectors; slice++) {
+            this.gl.drawArrays(this.gl.TRIANGLE_STRIP, offset, 2 * (this.sectors + 1));
+            offset += 2 * (this.sectors + 1);  // adjust if necessary
+        }
     }
 }
