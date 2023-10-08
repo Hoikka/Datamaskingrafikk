@@ -38,6 +38,7 @@ export class MyScooterApp extends BaseApp {
                 diffuseLightColor: this.gl.getUniformLocation(glslTextureLightShader.shaderProgram, 'uDiffuseLightColor'),
             },
         };
+        //Changing of the direction light and light colors is here!
         this.light = {
             lightPosition: {x: 20, y:0, z:0},
             diffuseLightColor: {r: 1, g: 0, b: 0},
