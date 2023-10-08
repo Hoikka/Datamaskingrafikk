@@ -11,7 +11,7 @@ export class Wheel extends BaseShape {
         this.height = height;
         this.radius = radius;
         this.rotation = 0;
-        this.normals = [];
+        
         this.createVertices();
         this.setTextureCoordinates();
         this.setColors();
@@ -57,9 +57,7 @@ export class Wheel extends BaseShape {
                 const z = (majorRadius + minorRadius * Math.cos(slice_angle)) * Math.sin(stack_angle);
 
                 this.positions.push(x, y, z);
-                this.normals.push( Math.cos(stack_angle) * Math.sin(slice_angle), 
-                Math.sin(stack_angle) * Math.sin(slice_angle), 
-                Math.cos(slice_angle));
+                
 
             }
         }
