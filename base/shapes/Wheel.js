@@ -15,7 +15,6 @@ export class Wheel extends BaseShape {
         this.createVertices();
         this.setTextureCoordinates();
         this.setColors();
-        this.initNormals();
         this.initTextures();
     }
 
@@ -64,12 +63,30 @@ export class Wheel extends BaseShape {
 
             }
         }
-    }
+        this.indices = [];
+        const vertsPerSlice = stacks + 1;
+        for (let slice = 0; slice < slices; slice++) {
+            let v1 = slice * vertsPerSlice;
+            let v2 = v1 + vertsPerSlice;
 
-    initNormals() {
-        this.normalBuffer = this.gl.createBuffer();
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.normalBuffer);
-        this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.positions), this.gl.STATIC_DRAW);
+            for (let stack = 0; stack < stacks; stack++) {
+                this.indices.push(v1);
+                this.indices.push(v1 + 1);
+                this.indices.push(v2);
+
+                this.indices.push(v2);
+                this.indices.push(v1 + 1);
+                this.indices.push(v2 + 1);
+
+                v1 += 1;
+                v2 += 1;
+            }
+        }
+
+        // Create and bind the WebGL buffer for indices:
+        this.buffers.index = this.gl.createBuffer();
+        this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.buffers.index);
+        this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(this.indices), this.gl.STATIC_DRAW);
     }
 
     connectNormalAttribute(gl, shader, normalBuffer) {
@@ -110,12 +127,14 @@ export class Wheel extends BaseShape {
         // Sides of the cylinder (Tire):
         const slices = this.sectors;
         const stacks = this.sectors;
+        const vStart = 0.73633;
+        const vEnd = 1;
 
         for (let slice = 0; slice <= slices; slice++) {
             const u = slice / slices;
 
             for (let stack = 0; stack <= stacks; stack++) {
-                const v = 0.73633 + (stack / stacks) * (1 - 0.73633);
+                const v = vStart + (stack / stacks) * (vEnd - vStart);
 
                 this.textureCoordinates.push(u, v);
             }
@@ -182,12 +201,11 @@ export class Wheel extends BaseShape {
         // You might also want to update the buffer
     }
 
-    draw(shaderInfo, elapsed, modelMatrix = (new Matrix4()).setIdentity()) {
-        super.draw(shaderInfo, elapsed, modelMatrix);
 
-        // Bind the normal buffer.
-        this.connectNormalAttribute(this.gl, shaderInfo, this.normalBuffer);
-        // Apply transformations
+    draw(shaderInfo, elapsed, modelMatrix = (new Matrix4()).setIdentity()) {
+        super.draw(shaderInfo, elapsed, modelMatrix);  // This sets up the shaders, binds the position/color/texcoord buffers, and sends matrices.
+
+        // Apply transformationsa
         modelMatrix.rotate(90, 1, 0, 0);
         modelMatrix.scale(1, 0.5, 1);
 
@@ -196,15 +214,18 @@ export class Wheel extends BaseShape {
 
         // Draw bottom circle:
         this.gl.drawArrays(this.gl.TRIANGLE_FAN, 0, this.sectors + 2);
-        // Draw top circle:
-        let offset = (this.sectors + 2);
-        this.gl.drawArrays(this.gl.TRIANGLE_FAN, offset, this.sectors + 2);
 
-        // Draw the sides:
-        offset += (this.sectors + 2);
-        for (let slice = 0; slice < this.sectors; slice++) {
-            this.gl.drawArrays(this.gl.TRIANGLE_STRIP, offset, 2 * (this.sectors + 1));
-            offset += 2 * (this.sectors + 1);  // adjust if necessary
-        }
+        // Draw top circle:
+        let offsetVertices = (this.sectors + 2);
+        this.gl.drawArrays(this.gl.TRIANGLE_FAN, offsetVertices, this.sectors + 2);
+
+        // Bind the index buffer for the torus:
+        this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.buffers.index);
+
+        // Calculate the number of indices needed to draw the torus:
+        let indexCountForTorus = this.sectors * this.sectors * 6; // 6 indices for each rectangle in the grid
+
+        // Draw the sides of the torus using the index buffer:
+        this.gl.drawElements(this.gl.TRIANGLES, indexCountForTorus, this.gl.UNSIGNED_SHORT, 0);
     }
 }
