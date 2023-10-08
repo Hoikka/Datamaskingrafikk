@@ -5,8 +5,8 @@
 import {Stack} from "../../base/helpers/Stack.js";
 import {CylinderTexture} from "../../base/shapes/CylinderTexture.js";
 import {CubeTextured} from "../../base/shapes/CubeTextured.js";
-import {Cylinder} from "../../base/shapes/Cylinder.js";
 import {Wheel} from "../../base/shapes/Wheel.js";
+import { XZPlane } from "../../base/shapes/XZPlane.js";
 
 export class Scooter {
     constructor(app) {
@@ -26,6 +26,9 @@ export class Scooter {
 
         this.cylinderBlack = new CylinderTexture(app,{red:1, green:0, blue:0, alpha:1},1,1);
         this.cylinderBlack.initBuffers();
+        
+        this.Plane = new XZPlane(app,17,17);
+        this.Plane.initBuffers();
 
         this.rotationHandle = 0;
         this.rotationWheel = 0;
@@ -126,7 +129,7 @@ export class Scooter {
 
         // Back wheel
         modelMatrix = this.stack.peekMatrix();
-        modelMatrix.translate(-5.5, 0, -1);
+        modelMatrix.translate(-5.5, 0, -0.2);
         modelMatrix.rotate(this.rotationWheel, 0, 0, 1);
         modelMatrix.rotate(90,1,0,0)
         this.stack.pushMatrix(modelMatrix);
@@ -143,6 +146,11 @@ export class Scooter {
     }
     drawHandle(shaderInfo,textureLightShaderInfo,elapsed,modelMatrix){
         this.initLight(textureLightShaderInfo);
+
+        //Plane
+        modelMatrix = this.stack.peekMatrix();
+        modelMatrix.translate(0,-1.1,0);
+        this.Plane.draw(textureLightShaderInfo,elapsed,modelMatrix);
 
         modelMatrix = this.stack.peekMatrix();
         modelMatrix.translate(6.5, 0, 0); // Move to the handle's position first
@@ -178,11 +186,12 @@ export class Scooter {
 
         // Front wheel
         modelMatrix = this.stack.peekMatrix();
-        modelMatrix.translate(0, 0, -1);
+        modelMatrix.translate(0, 0, -0.2);
         modelMatrix.rotate(this.rotationWheel, 0, 0, 1);
         modelMatrix.rotate(90,1,0,0)
         this.stack.pushMatrix(modelMatrix);
         this.drawWheels(textureLightShaderInfo, elapsed, modelMatrix)
         this.stack.popMatrix();
+        
     }
 }
