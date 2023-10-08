@@ -4,14 +4,14 @@ import {ImageLoader} from "../helpers/ImageLoader.js";
 import {isPowerOfTwo1} from "../lib/utility-functions.js";
 
 export class Wheel extends BaseShape {
-    constructor(app, color = {red:0.8, green:0.0, blue:0.6, alpha:1}, height=2, radius =1.0, sectors=36) {
+    constructor(app, color = {red:0.8, green:0.0, blue:0.6, alpha:1}, height=0.4, radius =1.0, sectors=36) {
         super(app);
         this.color = color;
         this.sectors = sectors;
         this.height = height;
         this.radius = radius;
         this.rotation = 0;
-
+        this.normals = [];
         this.createVertices();
         this.setTextureCoordinates();
         this.setColors();
@@ -53,11 +53,15 @@ export class Wheel extends BaseShape {
             for (let stack = 0; stack <= stacks; stack++) {
                 const stack_angle = (stack / stacks) * 2 * Math.PI; // v
 
-                const x = (majorRadius + minorRadius * Math.cos(stack_angle)) * Math.cos(slice_angle);
-                const y = minorRadius * Math.sin(stack_angle);
-                const z = (majorRadius + minorRadius * Math.cos(stack_angle)) * Math.sin(slice_angle);
+                const x = (majorRadius + minorRadius * Math.cos(slice_angle)) * Math.cos(stack_angle);
+                const y = minorRadius * Math.sin(slice_angle)+(this.height/2);
+                const z = (majorRadius + minorRadius * Math.cos(slice_angle)) * Math.sin(stack_angle);
 
                 this.positions.push(x, y, z);
+                this.normals.push( Math.cos(stack_angle) * Math.sin(slice_angle), 
+                Math.sin(stack_angle) * Math.sin(slice_angle), 
+                Math.cos(slice_angle));
+
             }
         }
     }
@@ -120,17 +124,21 @@ export class Wheel extends BaseShape {
 
 
     setColors() {
-        // Clear the existing colors:
-        this.colors = [];
+    // Clear the existing colors:
+    this.colors = [];
 
-        // Total vertices = 2 circles + sides
-        let totalVertices = 2 * (this.sectors + 2) + 2 * (this.sectors + 1);
+ 
 
-        // Set the color for each vertex:
-        for (let i = 0; i < totalVertices; i++) {
-            this.colors.push(this.color.red, this.color.green, this.color.blue, this.color.alpha);
-        }
+    // Total vertices = 2 circles (rims) + sides of the torus
+    let totalVertices = 2 * (this.sectors + 1) + this.sectors * this.sectors;
+
+ 
+
+    // Set the color for each vertex:
+    for (let i = 0; i < totalVertices; i++) {
+        this.colors.push(this.color.red, this.color.green, this.color.blue, this.color.alpha);
     }
+}
 
 
     initTextures() {
