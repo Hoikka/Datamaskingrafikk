@@ -112,7 +112,7 @@ export class Arm {
         meshUpperArm.castShadow = true;
         meshUpperArm.name = 'UpperArm';
         meshUpperArm.position.x = 0;
-        meshUpperArm.position.y = -50;
+        meshUpperArm.position.y = -45;
         meshUpperArm.position.z = 0;
         meshJoint2.add(meshUpperArm);
 
