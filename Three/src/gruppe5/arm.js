@@ -6,17 +6,20 @@ let MAX_OPEN = 100;
 export class Arm {
     constructor(textureObject) {
         this.textureObject = null;
+        this.cameraPosition = new THREE.Group();
         this.arm = this._createArmMesh(textureObject);
 
         // Rotasjon og kontroll
         this.claw = 0.0;
-        this.extension = 0.0;
+        this.extension = 10.0;
         this.baseRotation = 0.0;
-        this.joint1Rotation = 0.0;
-        this.joint2Rotation = 0.0;
-        this.baseJointRotation = 0.0;
+        this.joint1Rotation = 10.0;
+        this.joint2Rotation = -5.0;
+        this.baseJointRotation = 1.0;
 
         this.currentlyPressedKeys = [];
+
+
 
     }
 
@@ -60,16 +63,16 @@ export class Arm {
         meshBaseJoint.position.x = 0;
         meshBaseJoint.position.y = -12.5;
         meshBaseJoint.position.z = 0;
-        //meshBaseJoint.rotation.x = Math.PI / 2;
+        meshBaseJoint.rotation.x = Math.PI / 2;
         meshBase.add(meshBaseJoint);
 
         // LowerArm:
-        let gLowerArm = new THREE.CylinderGeometry(4, 4, 100, 8, 1, false);
+        let gLowerArm = new THREE.CylinderGeometry(4, 4, 80, 8, 1, false);
         let meshLowerArm = new THREE.Mesh(gLowerArm, material);
         meshLowerArm.castShadow = true;
         meshLowerArm.name = 'LowerArm';
         meshLowerArm.position.x = 0;
-        meshLowerArm.position.y = -50;
+        meshLowerArm.position.y = -40;
         meshLowerArm.position.z = 0;
         meshBaseJoint.add(meshLowerArm);
 
@@ -79,17 +82,17 @@ export class Arm {
         meshJoint1.castShadow = true;
         meshJoint1.name = 'joint1';
         meshJoint1.position.x = 0;
-        meshJoint1.position.y = -55;
+        meshJoint1.position.y = -45;
         meshJoint1.position.z = 0;
         meshLowerArm.add(meshJoint1);
 
         // arm1:
-        let gMidArm = new THREE.CylinderGeometry(4, 4, 100, 8, 1, false);
+        let gMidArm = new THREE.CylinderGeometry(4, 4, 80, 8, 1, false);
         let meshMidArm = new THREE.Mesh(gMidArm, material);
         meshMidArm.castShadow = true;
         meshMidArm.name = 'MidArm';
         meshMidArm.position.x = 0;
-        meshMidArm.position.y = -50;
+        meshMidArm.position.y = -40;
         meshMidArm.position.z = 0;
         meshJoint1.add(meshMidArm);
 
@@ -99,12 +102,12 @@ export class Arm {
         meshJoint2.name = 'joint2';
         meshJoint2.castShadow = true;
         meshJoint2.position.x = 0;
-        meshJoint2.position.y = -55;
+        meshJoint2.position.y = -45;
         meshJoint2.position.z = 0;
         meshMidArm.add(meshJoint2);
 
         // arm2:
-        let gUpperArm = new THREE.CylinderGeometry(4, 4, 100, 8, 1, false);
+        let gUpperArm = new THREE.CylinderGeometry(4, 4, 80, 8, 1, false);
         let meshUpperArm = new THREE.Mesh(gUpperArm, material);
         meshUpperArm.castShadow = true;
         meshUpperArm.name = 'UpperArm';
@@ -112,6 +115,10 @@ export class Arm {
         meshUpperArm.position.y = -50;
         meshUpperArm.position.z = 0;
         meshJoint2.add(meshUpperArm);
+
+        // Camera position:
+        this.cameraPosition.position.set(0, -30, -6);  // Adjust camera position on arm
+        meshUpperArm.add(this.cameraPosition);
 
         // arm2 extension:
         let gExtension = new THREE.CylinderGeometry(3, 3, 80, 8, 1, false);
@@ -124,6 +131,10 @@ export class Arm {
         meshUpperArm.add(meshExtension);
 
         return arm;
+    }
+
+    getCameraPosition() {
+        return this.cameraPosition;
     }
 
 
@@ -144,10 +155,10 @@ export class Arm {
             baseJointMesh.rotation.x = this.baseJointRotation;
         }
         if (joint1Mesh) {
-            joint1Mesh.rotation.x += this.joint1Rotation;
+            joint1Mesh.rotation.x = this.joint1Rotation;
         }
         if (joint2Mesh) {
-            joint2Mesh.rotation.x += this.joint2Rotation;
+            joint2Mesh.rotation.x = this.joint2Rotation;
         }
 
 

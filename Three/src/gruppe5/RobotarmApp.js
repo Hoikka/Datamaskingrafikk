@@ -34,6 +34,14 @@ export function main() {
     ri.camera.position.y = 150;
     ri.camera.position.z = 0;
 
+    // Claw camera
+    const clawCameraCanvas = document.getElementById('clawCameraCanvas');
+    ri.clawCameraRenderer = new THREE.WebGLRenderer({canvas: clawCameraCanvas, antialias: true});
+    ri.clawCameraRenderer.setSize(clawCameraCanvas.clientWidth, clawCameraCanvas.clientHeight);
+
+    ri.clawCamera = new THREE.PerspectiveCamera(75, clawCameraCanvas.clientWidth / clawCameraCanvas.clientHeight, 1, 1000);
+    ri.clawCamera.lookAt(new THREE.Vector3(0, -50, 0)); // Look slightly ahead
+
     // TrackballControls:
     ri.controls = new TrackballControls(ri.camera, ri.renderer.domElement);
     ri.controls.addEventListener( 'change', renderScene);
@@ -74,6 +82,8 @@ function addSceneObjects() {
     ri.armInstance.loadTexture((armMesh) => {
         ri.scene.add(armMesh);
     });
+    let cameraAnchor = ri.armInstance.getCameraPosition();
+    cameraAnchor.add(ri.clawCamera);
 
     // Start animasjonsløkka:
     animate(0);
@@ -131,6 +141,7 @@ function handleKeys(elapsed) {
 function renderScene()
 {
     ri.renderer.render(ri.scene, ri.camera);
+    ri.clawCameraRenderer.render(ri.scene, ri.clawCamera);
 }
 
 function onWindowResize() {
