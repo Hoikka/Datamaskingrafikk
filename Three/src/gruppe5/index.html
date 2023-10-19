@@ -5,8 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Robotarm</title>
 </head>
+
 <body>
-<script type="module">
+
+<div style="top:0px; left:15px; width:100%; text-align:left; color:black;" class="ui">
+    <h2>Robotarm</h2>
+    <button onclick="history.back()">Tilbake</button>
+    <div>
+        FPS: <span id="fps">--</span><br>
+        AD: Rotate base.<br>
+        QE: Extend arm.<br>
+        ZX: Open/Close claw.<br>
+        WS: Rotate joint.<br>
+        Shift+WS: Rotate another joint.<br>
+        Ctrl+WS: Rotate a different joint.<br>
+    </div>
+
+</div>
+<script type="module" src="./RobotarmApp.js"></script><script type="module">
     import {main} from "./RobotarmApp.js";
     main();
 </script>
