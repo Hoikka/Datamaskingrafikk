@@ -1,7 +1,5 @@
 import * as THREE from "three";
 
-let MAX_EXTENSION = 100;
-let MAX_OPEN = 100;
 
 export class Arm {
     constructor(textureObject) {
@@ -11,15 +9,13 @@ export class Arm {
 
         // Rotasjon og kontroll
         this.claw = 0.0;
-        this.extension = 10.0;
+        this.extension = 0.0;
         this.baseRotation = 0.0;
         this.joint1Rotation = 10.0;
         this.joint2Rotation = -5.0;
         this.baseJointRotation = 1.0;
 
         this.currentlyPressedKeys = [];
-
-
 
     }
 
@@ -197,10 +193,10 @@ export class Arm {
         }
 
         // Extend arm:
-        if (this.currentlyPressedKeys['KeyQ']) {
+        if (this.currentlyPressedKeys['KeyQ'] && this.extension < 0.0) {
             this.extension = this.extension + (EXTENSION_SPEED * delta);
         }
-        if (this.currentlyPressedKeys['KeyE']) {
+        if (this.currentlyPressedKeys['KeyE'] && this.extension > -80.0) {
             this.extension = this.extension - (EXTENSION_SPEED * delta);
         }
 
@@ -214,7 +210,7 @@ export class Arm {
 
         // Rotate base joint:
         if (this.currentlyPressedKeys['KeyS']) {
-            this.baseJointRotation = this.baseJointRotation + (rotationSpeed * delta);
+                        this.baseJointRotation = this.baseJointRotation + (rotationSpeed * delta);
         }
         if (this.currentlyPressedKeys['KeyW']) {
             this.baseJointRotation = this.baseJointRotation - (rotationSpeed * delta);

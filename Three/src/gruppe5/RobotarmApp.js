@@ -1,9 +1,9 @@
 import '../../static/style.css';
 import * as THREE from "three";
 import { Arm } from './arm.js';
-import { Box } from './box.js';
+import { Box } from './movableObject.js';
 import { Ground } from './ground.js';
-import {TrackballControls} from "three/examples/jsm/controls/TrackballControls";
+import { TrackballControls } from "three/examples/jsm/controls/TrackballControls";
 
 //Globalt objekt som er tilgjengelig fra alle funksjoner i denne Javascript-modulen/fila.
 let ri = {
