@@ -1,8 +1,8 @@
 import '../../static/style.css';
 import * as THREE from "three";
 import { Arm } from './arm.js';
-import { Box } from './movableObject.js';
 import { Ground } from './ground.js';
+import { Box, Cylinder } from './movableObject.js';
 import { TrackballControls } from "three/examples/jsm/controls/TrackballControls";
 
 //Globalt objekt som er tilgjengelig fra alle funksjoner i denne Javascript-modulen/fila.
@@ -71,7 +71,12 @@ function handleKeyDown(event) {
 function addSceneObjects() {
     // Create a box instance
     let boxInstance = new Box();
-    ri.scene.add(boxInstance.mesh);
+    ri.scene.add(boxInstance);
+    
+    // Create a cylinder instance
+    let cylinderInstance = new Cylinder();
+    cylinderInstance.move(0, 5, 40);
+    ri.scene.add(cylinderInstance);
 
     // Create a ground instance
     let groundInstance = new Ground(100, 10, 300);
