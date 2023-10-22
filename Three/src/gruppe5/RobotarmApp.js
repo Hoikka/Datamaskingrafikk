@@ -1,6 +1,7 @@
 import '../../static/style.css';
 import * as THREE from "three";
 import { Arm } from './arm.js';
+import { Claw } from './claw.js';
 import { Ground } from './ground.js';
 import { Box, Cylinder } from './movableObject.js';
 import { TrackballControls } from "three/examples/jsm/controls/TrackballControls";
@@ -90,6 +91,12 @@ function addSceneObjects() {
     let cameraAnchor = ri.armInstance.getCameraPosition();
     cameraAnchor.add(ri.clawCamera);
 
+    // Create the claw
+    ri.clawInstance = new Claw();
+    ri.clawInstance.loadTexture((clawMesh) => {
+        ri.armInstance.add(clawMesh);  // Add the claw to the arm
+    });
+
     // Start animasjonsløkka:
     animate(0);
 }
@@ -134,6 +141,7 @@ function animate(currentTime) {
 
     // Update the arm
     ri.armInstance.animate(delta);
+    ri.clawInstance.animate(delta);
 
     renderScene();
 }
@@ -141,6 +149,9 @@ function animate(currentTime) {
 function handleKeys(elapsed) {
     ri.armInstance.currentlyPressedKeys = ri.currentlyPressedKeys;
     ri.armInstance.handleKeys(elapsed);
+
+    ri.clawInstance.currentlyPressedKeys = ri.currentlyPressedKeys;
+    ri.clawInstance.handleKeys(elapsed);
 }
 
 function renderScene()

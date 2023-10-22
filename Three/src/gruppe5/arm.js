@@ -8,7 +8,6 @@ export class Arm {
         this.arm = this._createArmMesh(textureObject);
 
         // Rotasjon og kontroll
-        this.claw = 0.0;
         this.extension = 0.0;
         this.baseRotation = 0.0;
         this.joint1Rotation = 10.0;
@@ -16,7 +15,6 @@ export class Arm {
         this.baseJointRotation = 1.0;
 
         this.currentlyPressedKeys = [];
-
     }
 
     loadTexture(callback) {
@@ -146,7 +144,6 @@ export class Arm {
         let joint1Mesh = this.arm.getObjectByName("joint1", true);
         let joint2Mesh = this.arm.getObjectByName("joint2", true);
 
-
         if (baseJointMesh) {
             baseJointMesh.rotation.x = this.baseJointRotation;
         }
@@ -157,79 +154,58 @@ export class Arm {
             joint2Mesh.rotation.x = this.joint2Rotation;
         }
 
-
         // Handle arm extension:
         let extensionArm = this.arm.getObjectByName("ExtensionArm", true);
         if (extensionArm) {
             extensionArm.position.y = this.extension;
         }
-
-        // Handle claw opening/closing:
-        // This will be more specific depending on how your claw is structured.
-        // Let's say you have two parts of the claw that move away from or toward each other:
-        //let clawPart1 = this.arm.getObjectByName("ClawPart1");
-        //let clawPart2 = this.arm.getObjectByName("ClawPart2");
-        //if (clawPart1 && clawPart2) {
-        //    clawPart1.position.x -= this.arm.claw * deltaTime;
-        //    clawPart2.position.x += this.arm.claw * deltaTime;
-        //}
     }
 
     handleKeys(delta) {
-        let rotationSpeed = (Math.PI);
-        let EXTENSION_SPEED = 10.0;
-        let CLAW_SPEED = 10.0;
-
-        // Check for the modifiers:
-        let shiftPressed = this.currentlyPressedKeys['ShiftLeft'] || this.currentlyPressedKeys['ShiftRight'];
-        let ctrlPressed = this.currentlyPressedKeys['ControlLeft'] || this.currentlyPressedKeys['ControlRight'];
-
-        // Rotate base:
-        if (this.currentlyPressedKeys['KeyA']) {
-            this.baseRotation = this.baseRotation - (rotationSpeed * delta);
-        }
-        if (this.currentlyPressedKeys['KeyD']) {
-            this.baseRotation = this.baseRotation + (rotationSpeed * delta);
-        }
-
-        // Extend arm:
-        if (this.currentlyPressedKeys['KeyQ'] && this.extension < 0.0) {
-            this.extension = this.extension + (EXTENSION_SPEED * delta);
-        }
-        if (this.currentlyPressedKeys['KeyE'] && this.extension > -80.0) {
-            this.extension = this.extension - (EXTENSION_SPEED * delta);
-        }
-
-        // Open/close claw:
-        if (this.currentlyPressedKeys['KeyZ']) {
-            this.claw = this.claw - (CLAW_SPEED * delta);
-        }
-        if (this.currentlyPressedKeys['KeyX']) {
-            this.claw = this.claw + (CLAW_SPEED * delta);
-        }
-
-        // Rotate base joint:
+        const rotationSpeed = Math.PI;
+        const EXTENSION_SPEED = 15.0;
+    
+        // Check for the Shift key:
+        const shiftPressed = this.currentlyPressedKeys['ShiftLeft'] || this.currentlyPressedKeys['ShiftRight'];
+        
+        if (!shiftPressed) {
+            // Rotate base:
+            if (this.currentlyPressedKeys['KeyA']) {
+                this.baseRotation -= rotationSpeed * delta;
+            }
+            if (this.currentlyPressedKeys['KeyD']) {
+                this.baseRotation += rotationSpeed * delta;
+            }
+            // Rotate base joint:
         if (this.currentlyPressedKeys['KeyS']) {
-                        this.baseJointRotation = this.baseJointRotation + (rotationSpeed * delta);
+            this.baseJointRotation += rotationSpeed * delta;
         }
         if (this.currentlyPressedKeys['KeyW']) {
-            this.baseJointRotation = this.baseJointRotation - (rotationSpeed * delta);
+            this.baseJointRotation -= rotationSpeed * delta;
         }
-
-        // Rotate joint 1 & 2 based on Shift/Ctrl + WS:
+        }
+    
+        // Extend arm:
+        if (this.currentlyPressedKeys['KeyQ'] && this.extension < 0.0) {
+            this.extension += EXTENSION_SPEED * delta;
+        }
+        if (this.currentlyPressedKeys['KeyE'] && this.extension > -80.0) {
+            this.extension -= EXTENSION_SPEED * delta;
+        }
+    
+        // Rotate joint 1 & joint 2:
         if (shiftPressed) {
             if (this.currentlyPressedKeys['KeyS']) {
-                this.joint1Rotation = this.joint1Rotation + (rotationSpeed * delta);
+                this.joint1Rotation += rotationSpeed * delta;
             }
             if (this.currentlyPressedKeys['KeyW']) {
-                this.joint1Rotation = this.joint1Rotation - (rotationSpeed * delta);
+                this.joint1Rotation -= rotationSpeed * delta;
             }
-        } else if (ctrlPressed) {
-            if (this.currentlyPressedKeys['KeyS']) {
-                this.joint2Rotation = this.joint2Rotation + (rotationSpeed * delta);
+            if (this.currentlyPressedKeys['KeyA']) {
+                this.joint2Rotation -= rotationSpeed * delta;
             }
-            if (this.currentlyPressedKeys['KeyW']) {
-                this.joint2Rotation = this.joint2Rotation - (rotationSpeed * delta);
+            if (this.currentlyPressedKeys['KeyD']) {
+                this.joint2Rotation += rotationSpeed * delta;
             }
         }
     }
