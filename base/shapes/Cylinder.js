@@ -112,7 +112,7 @@ export class Cylinder extends BaseShape {
     draw(shaderInfo, elapsed, modelMatrix = (new Matrix4()).setIdentity()) {
         super.draw(shaderInfo, elapsed, modelMatrix);
         // Bind the normal buffer.
-        this.connectNormalAttribute(this.gl, shaderInfo, this.normalBuffer);
+        //this.connectNormalAttribute(this.gl, shaderInfo, this.normalBuffer);
         // Draw bottom circle:
         this.gl.drawArrays(this.gl.TRIANGLE_FAN, 0, this.sectors + 2);
         // Draw top circle:
