@@ -104,7 +104,7 @@ function addSceneObjects() {
     ri.scene.add(cylinderCloneInstance);
 
     // Create a ground instance
-    let groundInstance = new Ground(100, 10, 300);
+    let groundInstance = new Ground(170, 10, 300);
     ri.scene.add(groundInstance.mesh);
     groundInstance.mesh.receiveShadow=true;
     // Roof using ground instance
