@@ -178,10 +178,13 @@ export class Arm {
             }
             // Rotate base joint:
         if (this.currentlyPressedKeys['KeyS']) {
-            this.baseJointRotation += rotationSpeed * delta;
+            //if statements below to limit the rotation(these are limited to 45 degrees each direction)
+            if( this.baseJointRotation<(Math.PI/4)){
+                this.baseJointRotation += rotationSpeed * delta;}
         }
         if (this.currentlyPressedKeys['KeyW']) {
-            this.baseJointRotation -= rotationSpeed * delta;
+           if(this.baseJointRotation>(-Math.PI/4)){
+                this.baseJointRotation -= rotationSpeed * delta;}
         }
         }
     
@@ -196,16 +199,21 @@ export class Arm {
         // Rotate joint 1 & joint 2:
         if (shiftPressed) {
             if (this.currentlyPressedKeys['KeyS']) {
-                this.joint1Rotation += rotationSpeed * delta;
+                //if statements to lock rotation (current rotation 180 degree)
+                if( this.joint1Rotation<(4*Math.PI)){
+                    this.joint1Rotation += rotationSpeed * delta;}
             }
             if (this.currentlyPressedKeys['KeyW']) {
-                this.joint1Rotation -= rotationSpeed * delta;
+                if(this.joint1Rotation>(3*Math.PI)){
+                    this.joint1Rotation -= rotationSpeed * delta;}
             }
             if (this.currentlyPressedKeys['KeyA']) {
-                this.joint2Rotation -= rotationSpeed * delta;
+                if(this.joint2Rotation>(-5*Math.PI/2)){
+                this.joint2Rotation -= rotationSpeed * delta;}
             }
             if (this.currentlyPressedKeys['KeyD']) {
-                this.joint2Rotation += rotationSpeed * delta;
+                if( this.joint2Rotation<(-3*Math.PI/2)){
+                this.joint2Rotation += rotationSpeed * delta;}
             }
         }
     }
