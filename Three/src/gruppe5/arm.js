@@ -20,7 +20,7 @@ export class Arm {
     loadTexture(callback) {
         const loader = new THREE.TextureLoader();
         loader.load(
-            '../../../assets/textures/bird1.png',
+            '../../../assets/textures/metal.jpg',
             (textureObject) => {
                 this.textureObject = textureObject;
                 this.arm = this._createArmMesh(textureObject);
@@ -37,7 +37,7 @@ export class Arm {
         // Container for the whole arm:
         const arm = new THREE.Group();
 
-        let material = new THREE.MeshPhongMaterial({map: textureObject, wireframe: true});
+        let material = new THREE.MeshStandardMaterial({map: textureObject, wireframe: false});
 
         // Base:
         let gFoot = new THREE.CylinderGeometry(30, 20, 15, 20, 5, false);
@@ -71,7 +71,8 @@ export class Arm {
         meshBaseJoint.add(meshLowerArm);
 
         // Joint1:
-        let gJoint1 = new THREE.CylinderGeometry(5, 5, 10, 32);
+        let gJoint1 = new THREE.CylinderGeometry(7, 7, 10, 32);
+        gJoint1.rotateZ(Math.PI/2)
         let meshJoint1 = new THREE.Mesh(gJoint1, material);
         meshJoint1.castShadow = true;
         meshJoint1.name = 'joint1';
@@ -91,7 +92,8 @@ export class Arm {
         meshJoint1.add(meshMidArm);
 
         // Joint2:
-        let gJoint2 = new THREE.CylinderGeometry(5, 5, 10, 32);
+        let gJoint2 = new THREE.CylinderGeometry(7, 7, 10, 32);
+        gJoint2.rotateZ(Math.PI/2)
         let meshJoint2 = new THREE.Mesh(gJoint2, material);
         meshJoint2.name = 'joint2';
         meshJoint2.castShadow = true;
