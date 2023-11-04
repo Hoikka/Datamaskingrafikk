@@ -51,7 +51,7 @@ export class Arm {
 
         // Joint between base and first cylinder (LowerArm):
         let gBaseJoint = new THREE.CylinderGeometry(10, 10, 10, 32);
-        gBaseJoint.rotateZ(Math.PI/2)
+        gBaseJoint.rotateZ(Math.PI/2);
         let meshBaseJoint = new THREE.Mesh(gBaseJoint, material);
         meshBaseJoint.castShadow = true;
         meshBaseJoint.name = 'baseJoint';
@@ -73,7 +73,7 @@ export class Arm {
 
         // Joint1:
         let gJoint1 = new THREE.CylinderGeometry(7, 7, 10, 32);
-        gJoint1.rotateZ(Math.PI/2)
+        gJoint1.rotateZ(Math.PI/2);
         let meshJoint1 = new THREE.Mesh(gJoint1, material);
         meshJoint1.castShadow = true;
         meshJoint1.name = 'joint1';
@@ -94,7 +94,7 @@ export class Arm {
 
         // Joint2:
         let gJoint2 = new THREE.CylinderGeometry(7, 7, 10, 32);
-        gJoint2.rotateZ(Math.PI/2)
+        gJoint2.rotateZ(Math.PI/2);
         let meshJoint2 = new THREE.Mesh(gJoint2, material);
         meshJoint2.name = 'joint2';
         meshJoint2.castShadow = true;
@@ -182,11 +182,11 @@ export class Arm {
             // Rotate base joint:
         if (this.currentlyPressedKeys['KeyS']) {
             //if statements below to limit the rotation(these are limited to 45 degrees each direction)
-            if( this.baseJointRotation<(Math.PI/4)){
+            if( this.baseJointRotation<(Math.PI/2)){
                 this.baseJointRotation += rotationSpeed * delta;}
         }
         if (this.currentlyPressedKeys['KeyW']) {
-           if(this.baseJointRotation>(-Math.PI/4)){
+           if(this.baseJointRotation>(-Math.PI/2)){
                 this.baseJointRotation -= rotationSpeed * delta;}
         }
         }
