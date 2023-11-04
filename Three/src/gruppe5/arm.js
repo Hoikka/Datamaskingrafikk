@@ -50,7 +50,8 @@ export class Arm {
         arm.add(meshBase);
 
         // Joint between base and first cylinder (LowerArm):
-        let gBaseJoint = new THREE.CylinderGeometry(5, 5, 10, 32);
+        let gBaseJoint = new THREE.CylinderGeometry(10, 10, 10, 32);
+        gBaseJoint.rotateZ(Math.PI/2)
         let meshBaseJoint = new THREE.Mesh(gBaseJoint, material);
         meshBaseJoint.castShadow = true;
         meshBaseJoint.name = 'baseJoint';
