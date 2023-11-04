@@ -103,7 +103,7 @@ function addSceneObjects() {
     // Create a ground instance
     let groundInstance = new Ground(100, 10, 300);
     ri.scene.add(groundInstance.mesh);
-    groundInstance.recieveShadow = true;
+    groundInstance.mesh.receiveShadow=true;
     // Roof using ground instance
     let roofInstance = new Ground(100, 10, 400);
     //change the Y to move it to the roof
