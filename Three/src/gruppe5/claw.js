@@ -18,7 +18,7 @@ export class Claw extends THREE.Group {
             '../../../assets/textures/bird1.png',
             (textureObject) => {
                 this.textureObject = textureObject;
-                this.arm = this._createArmMesh(textureObject);
+                this.arm = this._createArmMesh(textureObject); //issue doesn't exist
                 callback(this.arm);
             },
             undefined,
