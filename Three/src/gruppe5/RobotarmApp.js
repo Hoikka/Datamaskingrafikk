@@ -70,20 +70,35 @@ function handleKeyDown(event) {
 }
 
 function addSceneObjects() {
-    // Create a box instance
-    let material = new THREE.MeshStandardMaterial({side: THREE.DoubleSide, wireframe: false});
+    // Create a box instance (red)
+    let materialRed = new THREE.MeshStandardMaterial({color:0xFF0000,side: THREE.DoubleSide, wireframe: false});
     let geometryBox = new THREE.BoxGeometry(10,20,10)
-    let boxInstance = new THREE.Mesh(geometryBox,material)
+    let boxInstance = new THREE.Mesh(geometryBox,materialRed)
+
     boxInstance.position.set(0,10,0)
     boxInstance.castShadow = true;
+    boxInstance.receiveShadow=true;
     ri.scene.add(boxInstance);
     
-    // Create a cylinder instance
+    // Create a cylinder instance ( blue)
     let geometryCylinder = new THREE.CylinderGeometry(7, 7, 20, 32)
-    let cylinderInstance = new THREE.Mesh(geometryCylinder,material)
-    cylinderInstance.position.set(0,10,50)
+    let materialBlue = new THREE.MeshStandardMaterial({color:0x0000FF ,side: THREE.DoubleSide, wireframe: false});
+    let cylinderInstance = new THREE.Mesh(geometryCylinder,materialBlue);
+
+    cylinderInstance.position.set(0,10,50);
     cylinderInstance.castShadow=true;
+    cylinderInstance.receiveShadow=true;
     ri.scene.add(cylinderInstance);
+
+    //clone of cylinder (yellow)
+    let cylinderClone = geometryCylinder.clone();
+    let materialYellow = new THREE.MeshStandardMaterial({color:0xFFFF00,side: THREE.DoubleSide, wireframe: false});
+    let cylinderCloneInstance = new THREE.Mesh(cylinderClone,materialYellow);
+
+    cylinderCloneInstance.position.set(0,10,-50);
+    cylinderCloneInstance.castShadow=true;
+    cylinderCloneInstance.receiveShadow=true;
+    ri.scene.add(cylinderCloneInstance);
 
     // Create a ground instance
     let groundInstance = new Ground(100, 10, 300);
