@@ -5,6 +5,7 @@ import { Claw } from './claw.js';
 import { Ground } from './ground.js';
 import { Box, Cylinder } from './movableObject.js';
 import { TrackballControls } from "three/examples/jsm/controls/TrackballControls";
+import GUI from 'lil-gui'; //NB! Må installeres før bruk: npm install --save lil-gui
 
 //Globalt objekt som er tilgjengelig fra alle funksjoner i denne Javascript-modulen/fila.
 let ri = {
@@ -27,6 +28,8 @@ export function main() {
     ri.scene.background = new THREE.Color( 0xdddddd );
 
     // Lys
+    // lil-gui kontroller:
+	ri.lilGui = new GUI();
     addLights();  // Lager rød strek
 
     // Kamera:
@@ -152,6 +155,15 @@ function addLights() {
 
     ri.scene.add(directionalLight1);
 
+    //lil-gui:
+	const directionalFolder = ri.lilGui.addFolder( 'Directional Light' );
+	directionalFolder.add(directionalLight1, 'visible').name("On/Off").onChange(value => {
+		directionalLightHelper.visible = value;
+		lightCamHelper.visible = value;
+	});
+	directionalFolder.add(directionalLight1, 'intensity').min(0).max(1).step(0.01).name("Intensity");
+	directionalFolder.addColor(directionalLight1, 'color').name("Color");
+
     //pointlight (white colour)
     let pointLight1 = new THREE.PointLight(0xffffff,10000);
     pointLight1.position.set(0,170,100);
@@ -170,6 +182,16 @@ function addLights() {
 
     ri.scene.add(pointLightHelper);
     ri.scene.add(pointLight1);
+
+    //lil-gui (pointlight):
+	const pointLigthFolder = ri.lilGui.addFolder( 'Pointlight' );
+	pointLigthFolder.add(pointLight1, 'visible').name("On/Off").onChange(value => {
+		pointLightHelper.visible = value;
+		pointLightCameraHelper.visible = value;
+	});
+	pointLigthFolder.add(pointLight1, 'intensity').min(0).max(10000).step(10).name("Intensity");
+	pointLigthFolder.addColor(pointLight1, 'color').name("Color");
+	pointLigthFolder.add(pointLight1.position, 'y').min(10).max(170).step(5).name("Height");
     
 }
 
