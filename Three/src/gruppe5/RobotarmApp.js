@@ -82,6 +82,11 @@ function addSceneObjects() {
     // Create a ground instance
     let groundInstance = new Ground(100, 10, 300);
     ri.scene.add(groundInstance.mesh);
+    // Roof using ground instance
+    let roofInstance = new Ground(100, 10, 400);
+    //change the Y to move it to the roof
+    roofInstance.mesh.position.setY(180)
+    ri.scene.add(roofInstance.mesh);
 
     // Create the Arm and load its textures
     ri.armInstance = new Arm();
