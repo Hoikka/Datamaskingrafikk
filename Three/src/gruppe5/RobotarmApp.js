@@ -71,17 +71,24 @@ function handleKeyDown(event) {
 
 function addSceneObjects() {
     // Create a box instance
-    let boxInstance = new Box();
+    let material = new THREE.MeshStandardMaterial({side: THREE.DoubleSide, wireframe: false});
+    let geometryBox = new THREE.BoxGeometry(10,20,10)
+    let boxInstance = new THREE.Mesh(geometryBox,material)
+    boxInstance.position.set(0,10,0)
+    boxInstance.castShadow = true;
     ri.scene.add(boxInstance);
     
     // Create a cylinder instance
-    let cylinderInstance = new Cylinder();
-    cylinderInstance.move(0, 5, 40);
+    let geometryCylinder = new THREE.CylinderGeometry(7, 7, 20, 32)
+    let cylinderInstance = new THREE.Mesh(geometryCylinder,material)
+    cylinderInstance.position.set(0,10,50)
+    cylinderInstance.castShadow=true;
     ri.scene.add(cylinderInstance);
 
     // Create a ground instance
     let groundInstance = new Ground(100, 10, 300);
     ri.scene.add(groundInstance.mesh);
+    groundInstance.recieveShadow = true;
     // Roof using ground instance
     let roofInstance = new Ground(100, 10, 400);
     //change the Y to move it to the roof
@@ -129,6 +136,26 @@ function addLights() {
     ri.scene.add( lightCamHelper );
 
     ri.scene.add(directionalLight1);
+
+    //pointlight (white colour)
+    let pointLight1 = new THREE.PointLight(0xffffff,10000);
+    pointLight1.position.set(0,170,100);
+    pointLight1.shadow.camera.near = 10;
+	pointLight1.shadow.camera.far = 300;
+	pointLight1.shadow.mapSize.width = 1024;
+	pointLight1.shadow.mapSize.width = 1024;
+    pointLight1.castShadow= true;
+    //visual of light source
+    const pointLightHelper = new THREE.PointLightHelper(pointLight1,10,0xffffff);
+    pointLightHelper.visible = true;
+
+    const pointLightCameraHelper = new THREE.CameraHelper(pointLight1.shadow.camera)
+	pointLightCameraHelper.visible = true;
+	ri.scene.add(pointLightCameraHelper);
+
+    ri.scene.add(pointLightHelper);
+    ri.scene.add(pointLight1);
+    
 }
 
 function animate(currentTime) {
