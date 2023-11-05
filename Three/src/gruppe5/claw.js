@@ -42,7 +42,6 @@ export class Claw extends THREE.Group {
         this._createFinger(new THREE.Vector3(-5, 0, -2), 45, material, 'Left'); // Left finger
         this._createFinger(new THREE.Vector3(0, 0, 2), -45, material, 'Middle');   // Middle finger
         this._createFinger(new THREE.Vector3(5, 0, -2), 45, material, 'Right');  // Right finger
-
     }
 
     _createFinger(position, angle, material, fingerName) {
@@ -90,14 +89,14 @@ export class Claw extends THREE.Group {
         let rightFingerHinge2 = this.getObjectByName("RightFinger2");
     
         if (leftFingerHinge1 && leftFingerHinge2 && middleFingerHinge1 && middleFingerHinge2 && rightFingerHinge1 && rightFingerHinge2) {
-            leftFingerHinge1.rotation.x = -this.clawOpenClose;
-            leftFingerHinge2.rotation.x = -this.clawOpenClose;
+            leftFingerHinge1.rotation.x = -this.clawOpenClose * 1.5;
+            leftFingerHinge2.rotation.x = -this.clawOpenClose * 1.5;
     
-            middleFingerHinge1.rotation.x = this.clawOpenClose * 2; // This rotates the bottom finger to "fit" between the two top fingers.
-            middleFingerHinge2.rotation.x = this.clawOpenClose * 2;
+            middleFingerHinge1.rotation.x = this.clawOpenClose * 1.5;
+            middleFingerHinge2.rotation.x = this.clawOpenClose * 1.5;
     
-            rightFingerHinge1.rotation.x = -this.clawOpenClose;
-            rightFingerHinge2.rotation.x = -this.clawOpenClose;
+            rightFingerHinge1.rotation.x = -this.clawOpenClose * 1.5;
+            rightFingerHinge2.rotation.x = -this.clawOpenClose * 1.5;
         }
 
         let base = this.getObjectByName("base");

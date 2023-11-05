@@ -1,4 +1,4 @@
-# Oblig 3
+# Oblig 3 - DTE-2800
 
 ## Gruppe 5
 

@@ -231,8 +231,7 @@ function handleKeys(elapsed) {
     ri.clawInstance.handleKeys(elapsed);
 }
 
-function renderScene()
-{
+function renderScene() {
     ri.renderer.render(ri.scene, ri.camera);
     ri.clawCameraRenderer.render(ri.scene, ri.clawCamera);
 }
