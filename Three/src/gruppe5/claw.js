@@ -29,87 +29,87 @@ export class Claw extends THREE.Group {
 
     _createClawMesh(textureObject) {
         // Materials
-        let baseMaterial = new THREE.MeshPhongMaterial({map: textureObject, wireframe: true});
-        let fingerMaterial = new THREE.MeshPhongMaterial({map: textureObject, wireframe: true});
+        let material = new THREE.MeshStandardMaterial({map: textureObject, wireframe: true});
 
         // Base
-        let baseGeometry = new THREE.CylinderGeometry(2, 2, 15, 20, 5, false);
-        this.base = new THREE.Mesh(baseGeometry, baseMaterial);
+        let baseGeometry = new THREE.CylinderGeometry(5, 5, 1, 20, 5, false);
+        this.base = new THREE.Mesh(baseGeometry, material);
+        this.base.name = 'base';
         this.add(this.base);
 
         // Fingers - assuming 3 fingers as mentioned
-        this._createFinger(new THREE.Vector3(-15, 0, 0), fingerMaterial); // Left finger
-        this._createFinger(new THREE.Vector3(0, 0, 0), fingerMaterial);   // Middle finger
-        this._createFinger(new THREE.Vector3(15, 0, 0), fingerMaterial);  // Right finger
+        this._createFinger(new THREE.Vector3(-5, 0, -2), 45, material, 'Left'); // Left finger
+        this._createFinger(new THREE.Vector3(0, 0, 2), -45, material, 'Middle');   // Middle finger
+        this._createFinger(new THREE.Vector3(5, 0, -2), 45, material, 'Right');  // Right finger
+
     }
 
-    _createFinger(position, material) {
+    _createFinger(position, angle, material, fingerName) {
         // Base cylinder of the finger
         let baseFingerGeometry = new THREE.CylinderGeometry(2, 2, 10, 32);
+        baseFingerGeometry.translate(0, 5, 0);
         let baseFinger = new THREE.Mesh(baseFingerGeometry, material);
+        baseFinger.name = `${fingerName}Base`;
         baseFinger.position.copy(position);
+        baseFinger.rotation.x = THREE.MathUtils.degToRad(angle + 180);
         this.add(baseFinger);
         
-        // 1st hinged cylinder - you can adjust the position and size as needed
-        let hinge1Geometry = new THREE.CylinderGeometry(1.5, 1.5, 8, 32);
-        let hinge1 = new THREE.Mesh(hinge1Geometry, material);
-        hinge1.position.y = position.y + 10; 
-        baseFinger.add(hinge1);
-
-        // 2nd hinged cylinder - adjust position and size as needed
-        let hinge2Geometry = new THREE.CylinderGeometry(1, 1, 6, 32);
-        let hinge2 = new THREE.Mesh(hinge2Geometry, material);
-        hinge2.position.y = position.y + 18;
-        hinge1.add(hinge2);
+        // Move the origin of the geometry to the bottom of the cylinder
+        let finger1Geometry = new THREE.CylinderGeometry(1.5, 1.5, 8, 32);
+        finger1Geometry.translate(0, 4, 0);
+        let finger1 = new THREE.Mesh(finger1Geometry, material);
+        finger1.name = `${fingerName}Finger1`;
+        finger1.position.y = 10;
+        baseFinger.add(finger1);
+        
+        // Move the origin of the geometry to the bottom of the cylinder
+        let finger2Geometry = new THREE.CylinderGeometry(1, 1, 6, 32);
+        finger2Geometry.translate(0, 3, 0);
+        let finger2 = new THREE.Mesh(finger2Geometry, material);
+        finger2.name = `${fingerName}Finger2`;
+        finger2.position.y = 8;
+        finger1.add(finger2);
     }
-
-    rotateClaw(angle) {
-        this.base.rotation.y += angle;
-    }
-
-    closeFingers() {
-        // Rotate fingers to simulate closing
-        this.leftFinger1.rotation.z += SOME_ANGLE;
-        this.leftFinger2.rotation.z -= SOME_ANGLE;
-        this.rightFinger.rotation.z += SOME_ANGLE;
-    }
-
-    openFingers() {
-        // Rotate fingers to simulate opening
-        this.leftFinger1.rotation.z -= SOME_ANGLE;
-        this.leftFinger2.rotation.z += SOME_ANGLE;
-        this.rightFinger.rotation.z -= SOME_ANGLE;
-    }
+    
 
     animate(deltaTime) {
         // Ensure that the claw's rotation does not exceed its limits.
         this.clawOpenClose = Math.max(-Math.PI / 4, Math.min(Math.PI / 4, this.clawOpenClose));
     
         // Update the claw's rotation based on the `clawOpenClose` property.
-        let leftFingerHinge1 = this.getObjectByName("leftFingerHinge1");
-        let leftFingerHinge2 = this.getObjectByName("leftFingerHinge2");
+        let leftFingerHinge1 = this.getObjectByName("LeftFinger1");
+        let leftFingerHinge2 = this.getObjectByName("LeftFinger2");
     
-        let middleFingerHinge1 = this.getObjectByName("middleFingerHinge1");
-        let middleFingerHinge2 = this.getObjectByName("middleFingerHinge2");
+        let middleFingerHinge1 = this.getObjectByName("MiddleFinger1");
+        let middleFingerHinge2 = this.getObjectByName("MiddleFinger2");
     
-        let rightFingerHinge1 = this.getObjectByName("rightFingerHinge1");
-        let rightFingerHinge2 = this.getObjectByName("rightFingerHinge2");
+        let rightFingerHinge1 = this.getObjectByName("RightFinger1");
+        let rightFingerHinge2 = this.getObjectByName("RightFinger2");
     
         if (leftFingerHinge1 && leftFingerHinge2 && middleFingerHinge1 && middleFingerHinge2 && rightFingerHinge1 && rightFingerHinge2) {
-            leftFingerHinge1.rotation.z = -this.clawOpenClose;
-            leftFingerHinge2.rotation.z = -this.clawOpenClose;
+            leftFingerHinge1.rotation.x = -this.clawOpenClose;
+            leftFingerHinge2.rotation.x = -this.clawOpenClose;
     
-            middleFingerHinge1.rotation.z = this.clawOpenClose * 2; // This rotates the bottom finger to "fit" between the two top fingers.
-            middleFingerHinge2.rotation.z = this.clawOpenClose * 2;
+            middleFingerHinge1.rotation.x = this.clawOpenClose * 2; // This rotates the bottom finger to "fit" between the two top fingers.
+            middleFingerHinge2.rotation.x = this.clawOpenClose * 2;
     
-            rightFingerHinge1.rotation.z = this.clawOpenClose;
-            rightFingerHinge2.rotation.z = this.clawOpenClose;
+            rightFingerHinge1.rotation.x = -this.clawOpenClose;
+            rightFingerHinge2.rotation.x = -this.clawOpenClose;
+        }
+
+        let base = this.getObjectByName("base");
+        if (base) {
+            //console.log('Base rotation:', this.base.rotation);
+
+            //console.log('Finger parent:', this.getObjectByName("LeftFinger1").parent);
+
+            base.rotation.y = this.clawRotation;
         }
     }
     
     handleKeys(delta) {
-        const CLAW_SPEED = 10.0;
-        const ROTATION_SPEED = Math.PI / 180 * 10;  // For example, 10 degrees per second.
+        const CLAW_SPEED = Math.PI;
+        const ROTATION_SPEED = Math.PI;
     
         // Check for the modifiers:
         let shiftPressed = this.currentlyPressedKeys['ShiftLeft'] || this.currentlyPressedKeys['ShiftRight'];
@@ -117,19 +117,19 @@ export class Claw extends THREE.Group {
         // Open/close claw:
         if (!shiftPressed) { // Only allow open/close when Shift isn't pressed.
             if (this.currentlyPressedKeys['KeyZ']) {
-                this.claw = this.claw - (CLAW_SPEED * delta);
+                this.clawOpenClose = Math.max(this.clawOpenClose - (CLAW_SPEED * delta), -Math.PI / 4);
             }
             if (this.currentlyPressedKeys['KeyX']) {
-                this.claw = this.claw + (CLAW_SPEED * delta);
+                this.clawOpenClose = Math.min(this.clawOpenClose + (CLAW_SPEED * delta), Math.PI / 4);
             }
+
         } else { // If Shift is pressed, then handle the rotation.
             if (this.currentlyPressedKeys['KeyZ']) {
-                this.rotation -= (ROTATION_SPEED * delta);  // Rotate the claw counter-clockwise
+                this.clawRotation -= ROTATION_SPEED * delta;
             }
             if (this.currentlyPressedKeys['KeyX']) {
-                this.rotation += (ROTATION_SPEED * delta);  // Rotate the claw clockwise
+                this.clawRotation += ROTATION_SPEED * delta;
             }
         }
     }
-    
 }

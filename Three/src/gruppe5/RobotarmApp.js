@@ -127,7 +127,7 @@ function addSceneObjects() {
         let extensionPart = ri.armInstance.getMeshExtension();
         extensionPart.add(clawMesh);
 
-        clawMesh.position.set(0, 0, 0);
+        clawMesh.position.set(0, -40, 0);
         clawMesh.rotation.set(0, 0, 0);
     });
 

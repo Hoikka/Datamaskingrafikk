@@ -136,7 +136,6 @@ export class Arm extends THREE.Group {
     }
 
     getMeshExtension() {
-        console.log(this.meshExtension);
         return this.meshExtension;
     }
 
