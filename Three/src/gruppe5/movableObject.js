@@ -10,8 +10,6 @@ class MovableObject extends THREE.Mesh {
     move(x, y, z) {
         this.position.set(x, y, z);
     }
-
-    // Add methods related to movement here.
 }
 
 export class Box extends MovableObject {
@@ -20,8 +18,6 @@ export class Box extends MovableObject {
         const material = new THREE.MeshBasicMaterial({color: 0xffff00});
         super(geometry, material);
     }
-
-    // Other methods related to Box's functionality.
 }
 
 export class Cylinder extends MovableObject {
@@ -30,6 +26,4 @@ export class Cylinder extends MovableObject {
         const material = new THREE.MeshBasicMaterial({color: 0xff0000});
         super(geometry, material);
     }
-
-    // Other methods related to Cylinder's functionality.
 }

@@ -13,6 +13,9 @@ Kjør deretter følgende kommandoer fra prosjektmappa:
 # Installer avhengigheter (kun første gang)
 npm install
 
+# Installer lil-gui
+npm install --save lil-gui
+
 # Kjør server på localhost:8080
 npm run dev
 

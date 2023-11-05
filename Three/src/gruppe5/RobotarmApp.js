@@ -3,14 +3,14 @@ import * as THREE from "three";
 import { Arm } from './arm.js';
 import { Claw } from './claw.js';
 import { Ground } from './ground.js';
-import { Box, Cylinder } from './movableObject.js';
+import { Box, Cylinder } from './movableObject.js';  // To be used when implementing collision detection for movable objects
 import { TrackballControls } from "three/examples/jsm/controls/TrackballControls";
 import GUI from 'lil-gui'; //NB! Må installeres før bruk: npm install --save lil-gui
 
 //Globalt objekt som er tilgjengelig fra alle funksjoner i denne Javascript-modulen/fila.
 let ri = {
     currentlyPressedKeys: []
-};  //ri=renderInfo
+};
 
 export function main() {
     const canvas = document.createElement('canvas');
@@ -107,8 +107,10 @@ function addSceneObjects() {
     let groundInstance = new Ground(170, 10, 300);
     ri.scene.add(groundInstance.mesh);
     groundInstance.mesh.receiveShadow=true;
+
     // Roof using ground instance
     let roofInstance = new Ground(100, 10, 400);
+
     //change the Y to move it to the roof
     roofInstance.mesh.position.setY(180)
     ri.scene.add(roofInstance.mesh);
@@ -128,7 +130,6 @@ function addSceneObjects() {
         extensionPart.add(clawMesh);
 
         clawMesh.position.set(0, -40, 0);
-        clawMesh.rotation.set(0, 0, 0);
     });
 
     // Start animasjonsløkka:
@@ -145,6 +146,7 @@ function addLights() {
     const directionalLightHelper = new THREE.DirectionalLightHelper( directionalLight1, 10, 0xff0000);
     directionalLightHelper.visible = true;
     ri.scene.add(directionalLightHelper);
+
     // Setter verdier til shadow camera:
     directionalLight1.shadow.camera.near = 0;
     directionalLight1.shadow.camera.far = 401;
@@ -152,6 +154,7 @@ function addLights() {
     directionalLight1.shadow.camera.right = 250;
     directionalLight1.shadow.camera.top = 250;
     directionalLight1.shadow.camera.bottom = -250;
+
     //Hjelpeklasse for å vise lysets utstrekning:
     let lightCamHelper = new THREE.CameraHelper( directionalLight1.shadow.camera );
     lightCamHelper.visible = false;
@@ -176,6 +179,7 @@ function addLights() {
 	pointLight1.shadow.mapSize.width = 1024;
 	pointLight1.shadow.mapSize.width = 1024;
     pointLight1.castShadow= true;
+
     //visual of light source
     const pointLightHelper = new THREE.PointLightHelper(pointLight1,10,0xffffff);
     pointLightHelper.visible = true;
@@ -193,10 +197,10 @@ function addLights() {
 		pointLightHelper.visible = value;
 		pointLightCameraHelper.visible = value;
 	});
+
 	pointLigthFolder.add(pointLight1, 'intensity').min(0).max(10000).step(10).name("Intensity");
 	pointLigthFolder.addColor(pointLight1, 'color').name("Color");
 	pointLigthFolder.add(pointLight1.position, 'y').min(10).max(170).step(5).name("Height");
-    
 }
 
 function animate(currentTime) {
