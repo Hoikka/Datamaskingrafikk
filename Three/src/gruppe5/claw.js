@@ -29,7 +29,7 @@ export class Claw extends THREE.Group {
 
     _createClawMesh(textureObject) {
         // Materials
-        let material = new THREE.MeshStandardMaterial({map: textureObject, wireframe: true});
+        let material = new THREE.MeshStandardMaterial({map: textureObject, wireframe: false});
 
         // Base
         let baseGeometry = new THREE.CylinderGeometry(5, 5, 1, 20, 5, false);
@@ -52,7 +52,7 @@ export class Claw extends THREE.Group {
         baseFinger.name = `${fingerName}Base`;
         baseFinger.position.copy(position);
         baseFinger.rotation.x = THREE.MathUtils.degToRad(angle + 180);
-        this.add(baseFinger);
+        this.base.add(baseFinger);
         
         // Move the origin of the geometry to the bottom of the cylinder
         let finger1Geometry = new THREE.CylinderGeometry(1.5, 1.5, 8, 32);
@@ -70,7 +70,6 @@ export class Claw extends THREE.Group {
         finger2.position.y = 8;
         finger1.add(finger2);
     }
-    
 
     animate(deltaTime) {
         // Ensure that the claw's rotation does not exceed its limits.
@@ -99,10 +98,6 @@ export class Claw extends THREE.Group {
 
         let base = this.getObjectByName("base");
         if (base) {
-            //console.log('Base rotation:', this.base.rotation);
-
-            //console.log('Finger parent:', this.getObjectByName("LeftFinger1").parent);
-
             base.rotation.y = this.clawRotation;
         }
     }
