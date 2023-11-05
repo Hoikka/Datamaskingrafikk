@@ -1,11 +1,13 @@
 import * as THREE from "three";
 
 
-export class Arm {
+export class Arm extends THREE.Group {
     constructor(textureObject) {
+        super();
         this.textureObject = null;
         this.cameraPosition = new THREE.Group();
         this.arm = this._createArmMesh(textureObject);
+        this.add(this.arm);
 
         // Rotasjon og kontroll
         this.extension = 0.0;
@@ -127,7 +129,15 @@ export class Arm {
         meshExtension.position.z = 0;
         meshUpperArm.add(meshExtension);
 
+        this.meshExtension = meshExtension;
+        
+
         return arm;
+    }
+
+    getMeshExtension() {
+        console.log(this.meshExtension);
+        return this.meshExtension;
     }
 
     getCameraPosition() {

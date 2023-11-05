@@ -124,7 +124,11 @@ function addSceneObjects() {
     // Create the claw
     ri.clawInstance = new Claw();
     ri.clawInstance.loadTexture((clawMesh) => {
-        ri.armInstance.add(clawMesh);  // Add the claw to the arm (issue this isn't working) idea: import claw into arm to attach it to the arm group
+        let extensionPart = ri.armInstance.getMeshExtension();
+        extensionPart.add(clawMesh);
+
+        clawMesh.position.set(0, 0, 0);
+        clawMesh.rotation.set(0, 0, 0);
     });
 
     // Start animasjonsløkka:

@@ -4,8 +4,7 @@ import * as THREE from "three";
 export class Claw extends THREE.Group {
     constructor(textureObject) {
         super();
-
-        this.claw = this._createClawMesh(textureObject);
+        this.textureObject = null;
         
         this.clawRotation = 0.0;
         this.clawOpenClose = 0.0;
@@ -15,11 +14,11 @@ export class Claw extends THREE.Group {
     loadTexture(callback) {
         const loader = new THREE.TextureLoader();
         loader.load(
-            '../../../assets/textures/bird1.png',
+            '../../../assets/textures/metal.jpg',
             (textureObject) => {
                 this.textureObject = textureObject;
-                this.arm = this._createArmMesh(textureObject); //issue doesn't exist
-                callback(this.arm);
+                this._createClawMesh(textureObject);
+                callback(this);
             },
             undefined,
             (error) => {
@@ -34,7 +33,7 @@ export class Claw extends THREE.Group {
         let fingerMaterial = new THREE.MeshPhongMaterial({map: textureObject, wireframe: true});
 
         // Base
-        let baseGeometry = new THREE.CylinderGeometry(30, 20, 15, 20, 5, false);
+        let baseGeometry = new THREE.CylinderGeometry(2, 2, 15, 20, 5, false);
         this.base = new THREE.Mesh(baseGeometry, baseMaterial);
         this.add(this.base);
 
