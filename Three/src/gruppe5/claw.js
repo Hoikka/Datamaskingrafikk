@@ -35,6 +35,7 @@ export class Claw extends THREE.Group {
         let baseGeometry = new THREE.CylinderGeometry(5, 5, 1, 20, 5, false);
         this.base = new THREE.Mesh(baseGeometry, material);
         this.base.name = 'base';
+        this.base.castShadow = true;
         this.add(this.base);
 
         // Fingers - assuming 3 fingers as mentioned
@@ -50,6 +51,7 @@ export class Claw extends THREE.Group {
         baseFingerGeometry.translate(0, 5, 0);
         let baseFinger = new THREE.Mesh(baseFingerGeometry, material);
         baseFinger.name = `${fingerName}Base`;
+        baseFinger.castShadow = true;
         baseFinger.position.copy(position);
         baseFinger.rotation.x = THREE.MathUtils.degToRad(angle + 180);
         this.base.add(baseFinger);
@@ -60,6 +62,7 @@ export class Claw extends THREE.Group {
         let finger1 = new THREE.Mesh(finger1Geometry, material);
         finger1.name = `${fingerName}Finger1`;
         finger1.position.y = 10;
+        finger1.castShadow = true;
         baseFinger.add(finger1);
         
         // Move the origin of the geometry to the bottom of the cylinder
@@ -67,6 +70,7 @@ export class Claw extends THREE.Group {
         finger2Geometry.translate(0, 3, 0);
         let finger2 = new THREE.Mesh(finger2Geometry, material);
         finger2.name = `${fingerName}Finger2`;
+        finger2.castShadow = true;
         finger2.position.y = 8;
         finger1.add(finger2);
     }
