@@ -1,79 +1,110 @@
 import '../../static/style.css';
 import * as THREE from "three";
-import { TrackballControls } from "three/examples/jsm/controls/TrackballControls";
-import GUI from 'lil-gui'; //NB! Må installeres før bruk: npm install --save lil-gui
+import Stats from 'stats.js';
 
-//Globalt objekt som er tilgjengelig fra alle funksjoner i denne Javascript-modulen/fila.
-let ri = {
-    currentlyPressedKeys: []
+import {
+	createThreeScene,
+	handleKeys,
+	onWindowResize,
+	renderScene,
+	updateThree
+} from "./utils/myThreeHelper.js";
+
+import {
+	createAmmoWorld,
+	updatePhysics
+} from "./utils/myAmmoHelper.js";
+
+import {
+	createAmmoCube,
+	createAmmoSpheres,
+	createAmmoXZPlane,
+	createMovable,
+} from "./utils/threeAmmoShapes.js";
+
+
+//Globale variabler:
+//MERK: Denne brukes også i myThreeHelper:
+export const ri = {
+	currentlyPressedKeys: [],
+	scene: undefined,
+	renderer: undefined,
+	camera: undefined,
+	clock: undefined,
+	controls: undefined,
+	lilGui: undefined,
+	stats: undefined
 };
 
+export const XZPLANE_SIDELENGTH = 100;
+
+
+
 export function main() {
-    const canvas = document.createElement('canvas');
-    document.body.appendChild(canvas);
 
-    // Renderer:
-    ri.renderer = new THREE.WebGLRenderer({canvas: canvas, antialias: true});
-    ri.renderer.setSize(window.innerWidth, window.innerHeight);
-    ri.renderer.shadowMap.enabled = true; //NB!
-    ri.renderer.shadowMapSoft = true;
-    ri.renderer.shadowMap.type = THREE.PCFSoftShadowMap; //THREE.BasicShadowMap;
+	ri.stats = new Stats();
+	ri.stats.showPanel( 0 ); // 0: fps, 1: ms, 2: mb, 3+: custom
+	document.body.appendChild( ri.stats.dom );
 
-    // Scene
-    ri.scene = new THREE.Scene();
-    ri.scene.background = new THREE.Color( 0xdddddd );
+	//Input - standard Javascript / WebGL:
+	document.addEventListener('keyup', handleKeyUp, false);
+	document.addEventListener('keydown', handleKeyDown, false);
 
-    // Lys
-    // lil-gui kontroller:
-	ri.lilGui = new GUI();
-    addLights();  // Lager rød strek
+	// three:
+	createThreeScene();
 
-    // Kamera:
-    ri.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    ri.camera.position.x = 300;
-    ri.camera.position.y = 150;
-    ri.camera.position.z = 0;
+	// ammo
+	createAmmoWorld(true);  //<<=== MERK!
 
-    // TrackballControls:
-    ri.controls = new TrackballControls(ri.camera, ri.renderer.domElement);
-    ri.controls.addEventListener( 'change', renderScene);
+	// Klokke for animasjon
+	ri.clock = new THREE.Clock();
 
-    // Klokke for animasjon
-    ri.clock = new THREE.Clock();
+	//Håndterer endring av vindusstørrelse:
+	window.addEventListener('resize', onWindowResize, false);
 
-    //Håndterer endring av vindusstørrelse:
-    window.addEventListener('resize', onWindowResize, false);
+	//Input - standard Javascript / WebGL:
+	document.addEventListener('keyup', handleKeyUp, false);
+	document.addEventListener('keydown', handleKeyDown, false);
 
-    // Sceneobjekter
-    addSceneObjects();
-
+	// three/ammo-objekter:
+	addAmmoSceneObjects();
 }
 
-function addSceneObjects() {
-    // Add objects here
-
-    // Start animasjonsløkka:
-    animate(0);
+function handleKeyUp(event) {
+	ri.currentlyPressedKeys[event.code] = false;
 }
 
-function addLights() {
-    // Add lights here
+function handleKeyDown(event) {
+	ri.currentlyPressedKeys[event.code] = true;
 }
 
-function animate(currentTime) {
-    requestAnimationFrame(animate);
-    renderScene();
+function addAmmoSceneObjects() {
+	createAmmoXZPlane();
+	createAmmoSpheres(20);
+	createAmmoCube();
+	createMovable();
+
+	animate(0);
 }
 
+function animate(currentTime, myThreeScene, myAmmoPhysicsWorld) {
+	window.requestAnimationFrame((currentTime) => {
+		animate(currentTime, myThreeScene, myAmmoPhysicsWorld);
+	});
+	let deltaTime = ri.clock.getDelta();
 
-function renderScene() {
-    ri.renderer.render(ri.scene, ri.camera);
-}
+	ri.stats.begin();
 
-function onWindowResize() {
-    ri.camera.aspect = window.innerWidth / window.innerHeight;
-    ri.camera.updateProjectionMatrix();
-    ri.renderer.setSize(window.innerWidth, window.innerHeight);
-    ri.controls.handleResize();
-    renderScene();
+	//Oppdaterer grafikken:
+	updateThree(deltaTime);
+
+	//Oppdaterer fysikken:
+	updatePhysics(deltaTime);
+
+	//Sjekker input:
+	handleKeys(deltaTime);
+
+	//Tegner scenen med gitt kamera:
+	renderScene();
+	ri.stats.end();
 }

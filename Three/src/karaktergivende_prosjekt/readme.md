@@ -1,11 +1,10 @@
 # Karaktergivende prosjekt - Rube Goldberg-maskin
 
-## Gruppe 5
+## Gruppe 3
 
 Eskil Hoikka & Morten Solbakken
 
 ## Videolink
-https://youtu.be/JbcxxjFYf48
 
 ## Installasjon
 Last ned og installer [Node.js](https://nodejs.org/en/download/).
