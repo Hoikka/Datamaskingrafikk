@@ -2,6 +2,11 @@ import '../../static/style.css';
 import * as THREE from "three";
 import Stats from 'stats.js';
 
+import { createRoom } from "./components/room.js";
+
+export const XZPLANE_SIDELENGTH = 100;
+
+
 import {
 	createThreeScene,
 	handleKeys,
@@ -35,9 +40,6 @@ export const ri = {
 	lilGui: undefined,
 	stats: undefined
 };
-
-export const XZPLANE_SIDELENGTH = 100;
-
 
 
 export function main() {
@@ -79,10 +81,13 @@ function handleKeyDown(event) {
 }
 
 function addAmmoSceneObjects() {
-	createAmmoXZPlane();
+	createRoom(ri.scene);
+
+	//createAmmoXZPlane();
 	createAmmoSpheres(20);
 	createAmmoCube();
 	createMovable();
+
 
 	animate(0);
 }
