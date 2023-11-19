@@ -15,7 +15,7 @@ function createTexturedMesh(geometry, texturePath) {
 
 
 // Function to create the floor
-export function createFloor() {
+function createFloor() {
 	const mass=0;
 	const position = {x: 0, y: 0, z: 0};
 
@@ -90,6 +90,7 @@ function createRoof() {
     let roofShape = new Ammo.btBoxShape(new Ammo.btVector3(FLOOR_ROOF_SIZE / 2, 0.1, FLOOR_ROOF_SIZE / 2)); // Thin box for roof
     let rigidBody = createAmmoRigidBody(roofShape, roofMesh, 0, 0.5, { x: 0, y: WALL_HEIGHT, z: 0 }, 0); // mass = 0 for static body
     
+    // Add to physics world
     roofMesh.userData.physicsBody = rigidBody;
     phy.ammoPhysicsWorld.addRigidBody(rigidBody);
     
