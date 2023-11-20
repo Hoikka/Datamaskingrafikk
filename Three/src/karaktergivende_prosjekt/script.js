@@ -3,13 +3,17 @@ import * as THREE from "three";
 import Stats from 'stats.js';
 
 import { createRoom } from "./components/room.js";
+import { StartBox } from './components/startBox.js';
 
 export const XZPLANE_SIDELENGTH = 100;
+export const WALL_HEIGHT = 500;
+export const FLOOR_ROOF_SIZE = 1000;
 
 
 import {
 	createThreeScene,
 	handleKeys,
+	onMouseClick,
 	onWindowResize,
 	renderScene,
 	updateThree
@@ -51,6 +55,7 @@ export function main() {
 	//Input - standard Javascript / WebGL:
 	document.addEventListener('keyup', handleKeyUp, false);
 	document.addEventListener('keydown', handleKeyDown, false);
+	document.addEventListener('click', onMouseClick);
 
 	// three:
 	createThreeScene();
@@ -64,10 +69,6 @@ export function main() {
 	//Håndterer endring av vindusstørrelse:
 	window.addEventListener('resize', onWindowResize, false);
 
-	//Input - standard Javascript / WebGL:
-	document.addEventListener('keyup', handleKeyUp, false);
-	document.addEventListener('keydown', handleKeyDown, false);
-
 	// three/ammo-objekter:
 	addAmmoSceneObjects();
 }
@@ -80,17 +81,19 @@ function handleKeyDown(event) {
 	ri.currentlyPressedKeys[event.code] = true;
 }
 
+
 function addAmmoSceneObjects() {
 	createRoom(ri.scene);
+	ri.scene.startBox = new StartBox();
 
-	//createAmmoXZPlane();
-	createAmmoSpheres(20);
-	createAmmoCube();
-	createMovable();
+	//createAmmoSpheres(20);
+	//createAmmoCube();
+	//createMovable();
 
 
 	animate(0);
 }
+
 
 function animate(currentTime, myThreeScene, myAmmoPhysicsWorld) {
 	window.requestAnimationFrame((currentTime) => {
@@ -111,5 +114,8 @@ function animate(currentTime, myThreeScene, myAmmoPhysicsWorld) {
 
 	//Tegner scenen med gitt kamera:
 	renderScene();
+
+	onMouseClick(deltaTime);
+
 	ri.stats.end();
 }

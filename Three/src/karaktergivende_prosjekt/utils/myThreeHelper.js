@@ -79,6 +79,30 @@ export function addLights() {
 	directionalFolder.addColor(directionalLight, 'color').name("Color");
 }
 
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+export function onMouseClick(event) {
+    // Convert the mouse position to normalized device coordinates (-1 to +1) for the raycaster
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+
+    // Update the raycaster with the camera and mouse position
+    raycaster.setFromCamera(mouse, ri.camera);
+
+	const buttonMesh = ri.scene.getObjectByName('button');
+    if (buttonMesh) {
+
+		// Calculate objects intersecting the picking ray
+		const intersects = raycaster.intersectObjects([buttonMesh]);
+
+		if (intersects.length > 0) {
+			// Button was clicked
+			ri.scene.startBox.pushButton(intersects[0].object);
+		}
+	}
+}
+
+
 //Sjekker tastaturet:
 export function handleKeys(delta) {
 	if (ri.currentlyPressedKeys['KeyH']) {	//H
@@ -132,4 +156,12 @@ export function getRigidBodyFromMesh(meshName) {
 		return mesh.userData.physicsBody;
 	else
 		return null;
+}
+
+// Function to create and return a textured mesh
+export function createTexturedMesh(geometry, texturePath) {
+    const textureLoader = new THREE.TextureLoader();
+    const texture = textureLoader.load(texturePath);
+    const material = new THREE.MeshStandardMaterial({ map: texture });
+    return new THREE.Mesh(geometry, material);
 }

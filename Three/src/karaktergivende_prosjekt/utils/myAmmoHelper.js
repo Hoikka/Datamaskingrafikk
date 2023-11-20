@@ -1,4 +1,7 @@
 export const IMPULSE_FORCE = 10;
+export const COLLISION_GROUP_DEFAULT = 1;
+export const COLLISION_GROUP_MOVEABLE = 2;
+
 
 export let phy = {
 	rigidBodies: [],

@@ -1,17 +1,8 @@
 import * as THREE from 'three';
-import { addMeshToScene } from '../utils/myThreeHelper';
+import { addMeshToScene, createTexturedMesh } from '../utils/myThreeHelper';
 import { createAmmoRigidBody, phy } from '../utils/myAmmoHelper';
+import { WALL_HEIGHT, FLOOR_ROOF_SIZE } from '../script';
 
-const WALL_HEIGHT = 500;
-const FLOOR_ROOF_SIZE = 1000;
-
-// Function to create and return a textured mesh
-function createTexturedMesh(geometry, texturePath) {
-    const textureLoader = new THREE.TextureLoader();
-    const texture = textureLoader.load(texturePath);
-    const material = new THREE.MeshStandardMaterial({ map: texture });
-    return new THREE.Mesh(geometry, material);
-}
 
 
 // Function to create the floor
@@ -42,7 +33,7 @@ function createFloor() {
 
 // Create walls
 function createWalls() {
-    const wallThickness = 1; // Adjust as needed
+    const wallThickness = 1;
 
     const wallPositions = [
         new THREE.Vector3(0, WALL_HEIGHT / 2, -FLOOR_ROOF_SIZE / 2), // Back
