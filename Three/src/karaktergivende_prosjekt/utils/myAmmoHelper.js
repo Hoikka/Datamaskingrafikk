@@ -1,12 +1,18 @@
-export const IMPULSE_FORCE = 10;
-export const COLLISION_GROUP_DEFAULT = 1;
-export const COLLISION_GROUP_MOVEABLE = 2;
+export const COLLISION_GROUP_PLANE = 1;
+export const COLLISION_GROUP_SPHERE = 2;
+export const COLLISION_GROUP_MOVEABLE = 4;
+export const COLLISION_GROUP_BOX = 8;
+export const COLLISION_GROUP_HINGE_SPHERE = 16;
+export const COLLISION_GROUP_SPRING = 32;
+export const COLLISION_GROUP_P2P = 64;
 
 
-export let phy = {
+export const phy = {
+	ammoPhysicsWorld: undefined,
 	rigidBodies: [],
+	checkCollisions: true,
 	transform: undefined
-}
+};
 
 export function createAmmoWorld() {
 	phy.transform = new Ammo.btTransform(); // Hjelpeobjekt.

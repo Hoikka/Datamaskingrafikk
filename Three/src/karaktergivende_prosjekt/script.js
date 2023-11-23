@@ -3,7 +3,8 @@ import * as THREE from "three";
 import Stats from 'stats.js';
 
 import { createRoom } from "./components/room.js";
-import { StartBox } from './components/startBox.js';
+import { StartBox } from './components/sequence_1';
+import { Ball } from './components/ball.js';
 
 export const XZPLANE_SIDELENGTH = 100;
 export const WALL_HEIGHT = 500;
@@ -85,6 +86,12 @@ function handleKeyDown(event) {
 function addAmmoSceneObjects() {
 	createRoom(ri.scene);
 	ri.scene.startBox = new StartBox();
+	ri.scene.ball = new Ball();
+
+	ri.scene.traverse((object) => {
+		console.log(object);
+	});
+	
 
 	//createAmmoSpheres(20);
 	//createAmmoCube();
