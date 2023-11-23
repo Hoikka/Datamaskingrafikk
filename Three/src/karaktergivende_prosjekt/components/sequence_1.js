@@ -26,7 +26,7 @@ export class StartBox {
         this.createBox(wallCenterX, wallCenterY, 0);
         this.button = this.createButton(wallCenterX, wallCenterY, 0);
         this.bottom = this.createHingedBoxBottom(wallCenterX, wallCenterY, 0);
-        this.createHinge(wallCenterX, wallCenterY, 0);
+        //this.createHinge(wallCenterX, wallCenterY, 0);
     }
 
 
@@ -57,6 +57,7 @@ export class StartBox {
             panelMesh.rotation.copy(panelRotations[i]);
             panelMesh.castShadow = true;
             panelMesh.receiveShadow = true;
+            panelMesh.name = 'box_panel ' + i;
     
             // Create Ammo.js rigid body for the panel
             let panelShape = new Ammo.btBoxShape(new Ammo.btVector3(
@@ -113,7 +114,7 @@ export class StartBox {
 
     createHingedBoxBottom(x, y, z) {
         //console.log('createHingedBoxBottom');
-        const mass = 0;
+        const mass = 10;
         const boxHeight = BOX_HEIGHT;
         const boxBottomThickness = 0.01;
         x -= boxHeight / 2; // Adjust for the center of the box
@@ -124,6 +125,7 @@ export class StartBox {
         bottomMesh.rotation.set(-Math.PI / 2, 0, 0);
         bottomMesh.castShadow = true;
         bottomMesh.receiveShadow = true;
+        bottomMesh.name = 'box_bottom';
         //const direction = new THREE.Vector3();
         //bottomMesh.getWorldDirection(direction);
     

@@ -55,6 +55,7 @@ function createWalls() {
         wallMesh.position.copy(wallPositions[i]);
         wallMesh.rotation.copy(wallRotations[i]);
         wallMesh.receiveShadow = true;
+        wallMesh.name = 'wall ' + i;
 
         // AMMO:
         let wallShape = new Ammo.btBoxShape(new Ammo.btVector3(FLOOR_ROOF_SIZE / 2, WALL_HEIGHT / 2, wallThickness / 2));
