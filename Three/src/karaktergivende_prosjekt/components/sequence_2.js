@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { createAmmoRigidBody, phy } from '../utils/myAmmoHelper';
 import { addMeshToScene, createTexturedMesh } from '../utils/myThreeHelper';
+import { createConvexTriangleShapeAddToCompound } from "../utils/triangleMeshHelpers";
 import { WALL_HEIGHT, FLOOR_ROOF_SIZE } from '../script';
 import {
 	COLLISION_GROUP_BOX, COLLISION_GROUP_HINGE_SPHERE,
@@ -9,54 +10,119 @@ import {
 	COLLISION_GROUP_SPHERE,
 	COLLISION_GROUP_SPRING
 } from "../utils/myAmmoHelper";
+import { add } from "@tweenjs/tween.js";
 
 
 export class FunnelTubeSystem {
     constructor() {
         const x = FLOOR_ROOF_SIZE / 2 - 50;
-        const y = WALL_HEIGHT / 2 - 100;
+        const y = WALL_HEIGHT / 2 - 120;
         const z = 0;
+
+        let position = { x: x, y: y, z: z };
+
+        this.createFunnelSystem(position);
         
-        this.createFunnel(x, y, z);
+    }
+
+    createFunnelSystem(position) {
+        let compoundShape = new Ammo.btCompoundShape();
+
+        let groupMesh = new THREE.Group();
+        groupMesh.userData.tag = 'funnelSystem';
+        groupMesh.position.set(position);
+
+        let material = new THREE.MeshStandardMaterial({ color: 0x00ff00, side: THREE.DoubleSide });
+
+        this.createCurvedSlide(groupMesh, compoundShape, material);
+        this.createFunnel(groupMesh, compoundShape, material);
+
+    
+        // Sett samme transformasjon på compoundShape som på bottomMesh:
+        let rigidBody = createAmmoRigidBody(compoundShape, groupMesh, 0.4, 0.6, position, 0);
+        groupMesh.userData.physicsBody = rigidBody;
+        // Legger til physics world:
+        phy.ammoPhysicsWorld.addRigidBody(rigidBody);
+
+        addMeshToScene(groupMesh);
+        phy.rigidBodies.push(groupMesh);
+        rigidBody.threeMesh = groupMesh;
     }
 
 
-    createFunnel(x, y, z) {
-        console.log("Creating funnel");
-        // Three.js funnel geometry and mesh
-        const radiusTop = 50;
-        const radiusBottom = 100;
-        const height = 30;
-        const radialSegments = 32;
+    createCurvedSlide(groupMesh, compoundShape, material) {
+        // Define points for the curve
+        const points = [
+            // Start at (0,0,0)
+            new THREE.Vector3(0, 0, 0),
 
-        const funnelGeometry = new THREE.ConeGeometry(radiusTop, radiusBottom, height, radialSegments, 1, true);
-        const funnelMaterial = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
-        const funnelMesh = new THREE.Mesh(funnelGeometry, funnelMaterial);
+            // Transition to slide
+            new THREE.Vector3(0, -10, 0),
+        
+            // Slide points extending downward
+            new THREE.Vector3(-10, -20, 0),
+            new THREE.Vector3(-30, -30, 0),
+            new THREE.Vector3(-40, -35, 0),
+        ];
+        let curve = new THREE.CatmullRomCurve3(points);
+    
+        // Tube geometry
+        let tubeGeometry = new THREE.TubeGeometry(curve, 20, 10, 8, false);
+    
+        // Creating the mesh
+        let slideMesh = new THREE.Mesh(tubeGeometry, material);
+        slideMesh.name = 'slide';
+        groupMesh.add(slideMesh);
+        createConvexTriangleShapeAddToCompound(compoundShape, slideMesh);
+    }
+    
+    createFunnel(groupMesh, compoundShape, material) {
+        const topRadius = 40;
+        const bottomRadius = 10;
+        const height = 50;
+        const segments = 32;
 
-        // Position the funnel
-        funnelMesh.position.set(x , y, z);
-        funnelMesh.rotation.x = -Math.PI; // Rotate to make the funnel's opening face upwards
-        funnelMesh.castShadow = true;
-        funnelMesh.receiveShadow = true;
+        // Buffers for vertices and indices
+        const vertices = [];
+        const indices = [];
+    
+        // Top circle vertices
+        for (let i = 0; i < segments; i++) {
+            const theta = (i / segments) * Math.PI * 2;
+            vertices.push(Math.cos(theta) * topRadius, height, Math.sin(theta) * topRadius);
+        }
+    
+        // Bottom circle vertices
+        for (let i = 0; i < segments; i++) {
+            const theta = (i / segments) * Math.PI * 2;
+            vertices.push(Math.cos(theta) * bottomRadius, 0, Math.sin(theta) * bottomRadius);
+        }
+    
+        // Center top vertex
+        vertices.push(0, height, 0);
+    
+        // Indices for the side triangles
+        for (let i = 0; i < segments; i++) {
+            const a = i;
+            const b = (i + 1) % segments;
+            const c = i + segments;
+            const d = (i + 1) % segments + segments;
+    
+            indices.push(a, b, c);
+            indices.push(b, d, c);
+        }
+  
+        // Create BufferGeometry
+        let funnelGeometry = new THREE.BufferGeometry();
+        funnelGeometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+        funnelGeometry.setIndex(indices);
+        funnelGeometry.computeVertexNormals(); // For proper lighting
+    
+        let funnelMesh = new THREE.Mesh(funnelGeometry, material);
+        //funnelMesh.position.set(x, y + 100, z);
         funnelMesh.name = 'funnel';
+        groupMesh.add(funnelMesh);
 
-        // Ammo.js physics for the funnel
-        const shape = new Ammo.btConeShape(radiusBottom, height);
-        const mass = 0; // Mass of 0 for static objects
-        let rigidBody = createAmmoRigidBody(shape, funnelMesh, 0.7, 0.5, funnelMesh.position, mass);
-
-        funnelMesh.userData.physicsBody = rigidBody;
-        phy.ammoPhysicsWorld.addRigidBody(rigidBody,
-            COLLISION_GROUP_BOX,
-            COLLISION_GROUP_BOX |
-                COLLISION_GROUP_SPHERE |
-                COLLISION_GROUP_MOVEABLE |
-                COLLISION_GROUP_PLANE |
-                COLLISION_GROUP_SPRING);
-
-        addMeshToScene(funnelMesh);
-        phy.rigidBodies.push(funnelMesh);
-        console.log(funnelMesh);
+        createConvexTriangleShapeAddToCompound(compoundShape, funnelMesh);
     }
-
 } 

@@ -25,7 +25,7 @@ export class StartBox {
 
         this.createBox(wallCenterX, wallCenterY, 0);
         this.button = this.createButton(wallCenterX, wallCenterY, 0);
-        this.bottom = this.createHingedBoxBottom(wallCenterX, wallCenterY, 0);
+        //this.bottom = this.createHingedBoxBottom(wallCenterX, wallCenterY, 0);
         //this.createHinge(wallCenterX, wallCenterY, 0);
     }
 
