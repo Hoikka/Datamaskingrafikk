@@ -14,7 +14,9 @@ export const phy = {
 	transform: undefined
 };
 
-export function createAmmoWorld() {
+export function createAmmoWorld(checkCollisions= true) {
+	phy.checkCollisions = checkCollisions;
+
 	phy.transform = new Ammo.btTransform(); // Hjelpeobjekt.
 
 	// Initialiserer phy.ammoPhysicsWorld:

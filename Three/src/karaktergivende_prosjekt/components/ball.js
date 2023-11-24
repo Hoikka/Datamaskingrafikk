@@ -3,10 +3,17 @@ import { addMeshToScene} from '../utils/myThreeHelper';
 import { createAmmoRigidBody, phy } from '../utils/myAmmoHelper';
 import { WALL_HEIGHT, FLOOR_ROOF_SIZE } from '../script';
 import { BOX_HEIGHT } from './sequence_1.js';
+import {
+	COLLISION_GROUP_BOX, COLLISION_GROUP_HINGE_SPHERE,
+	COLLISION_GROUP_MOVEABLE,
+	COLLISION_GROUP_PLANE,
+	COLLISION_GROUP_SPHERE,
+	COLLISION_GROUP_SPRING
+} from "../utils/myAmmoHelper";
 
 
 export class Ball {
-    constructor(radius = 10, color = 0xff0000) {
+    constructor(radius = 7, color = 0xff0000) {
 
         var x = FLOOR_ROOF_SIZE/2 - BOX_HEIGHT /2;
         var y = WALL_HEIGHT / 2;
@@ -39,7 +46,13 @@ export class Ball {
         mesh.userData.physicsBody = rigidBody;
     
         // Legger til physics world:
-        phy.ammoPhysicsWorld.addRigidBody(rigidBody);
+        phy.ammoPhysicsWorld.addRigidBody(
+            rigidBody,
+            COLLISION_GROUP_SPHERE,
+			COLLISION_GROUP_SPHERE |
+			COLLISION_GROUP_BOX |
+			COLLISION_GROUP_MOVEABLE |
+			COLLISION_GROUP_PLANE );
     
         addMeshToScene(mesh);
         phy.rigidBodies.push(mesh);

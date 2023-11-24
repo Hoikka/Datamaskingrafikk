@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { createAmmoRigidBody, phy } from '../utils/myAmmoHelper';
 import { addMeshToScene, createTexturedMesh } from '../utils/myThreeHelper';
-import { createConvexTriangleShapeAddToCompound } from "../utils/triangleMeshHelpers";
+import { createConvexTriangleShapeAddToCompound, createTriangleShapeAddToCompound } from "../utils/triangleMeshHelpers";
 import { WALL_HEIGHT, FLOOR_ROOF_SIZE } from '../script';
 import {
 	COLLISION_GROUP_BOX, COLLISION_GROUP_HINGE_SPHERE,
@@ -10,7 +10,6 @@ import {
 	COLLISION_GROUP_SPHERE,
 	COLLISION_GROUP_SPRING
 } from "../utils/myAmmoHelper";
-import { add } from "@tweenjs/tween.js";
 
 
 export class FunnelTubeSystem {
@@ -30,19 +29,26 @@ export class FunnelTubeSystem {
 
         let groupMesh = new THREE.Group();
         groupMesh.userData.tag = 'funnelSystem';
-        groupMesh.position.set(position);
+        groupMesh.position.set(position.x, position.y, position.z);
 
         let material = new THREE.MeshStandardMaterial({ color: 0x00ff00, side: THREE.DoubleSide });
 
         this.createCurvedSlide(groupMesh, compoundShape, material);
-        this.createFunnel(groupMesh, compoundShape, material);
-
+        this.createFunnel(groupMesh, compoundShape, material, position);
     
         // Sett samme transformasjon på compoundShape som på bottomMesh:
-        let rigidBody = createAmmoRigidBody(compoundShape, groupMesh, 0.4, 0.6, position, 0);
+        let rigidBody = createAmmoRigidBody(compoundShape, groupMesh, 0, 0.6, position, 0);
         groupMesh.userData.physicsBody = rigidBody;
         // Legger til physics world:
-        phy.ammoPhysicsWorld.addRigidBody(rigidBody);
+        phy.ammoPhysicsWorld.addRigidBody(rigidBody,
+            COLLISION_GROUP_BOX,
+            COLLISION_GROUP_BOX |
+                COLLISION_GROUP_SPHERE |
+                COLLISION_GROUP_MOVEABLE |
+                COLLISION_GROUP_PLANE |
+                COLLISION_GROUP_SPRING
+        );
+
 
         addMeshToScene(groupMesh);
         phy.rigidBodies.push(groupMesh);
@@ -73,10 +79,10 @@ export class FunnelTubeSystem {
         let slideMesh = new THREE.Mesh(tubeGeometry, material);
         slideMesh.name = 'slide';
         groupMesh.add(slideMesh);
-        createConvexTriangleShapeAddToCompound(compoundShape, slideMesh);
+        createTriangleShapeAddToCompound(compoundShape, slideMesh);
     }
     
-    createFunnel(groupMesh, compoundShape, material) {
+    createFunnel(groupMesh, compoundShape, material, position) {
         const topRadius = 40;
         const bottomRadius = 10;
         const height = 50;
@@ -112,17 +118,42 @@ export class FunnelTubeSystem {
             indices.push(b, d, c);
         }
   
-        // Create BufferGeometry
+        // Create the btTriangleMesh
+        let triangleMesh = new Ammo.btTriangleMesh(true, true);
+        for (let i = 0; i * 3 < indices.length; i++) {
+            triangleMesh.addTriangle(
+                new Ammo.btVector3(vertices[indices[i * 3] * 3], vertices[indices[i * 3] * 3 + 1], vertices[indices[i * 3] * 3 + 2]),
+                new Ammo.btVector3(vertices[indices[i * 3 + 1] * 3], vertices[indices[i * 3 + 1] * 3 + 1], vertices[indices[i * 3 + 1] * 3 + 2]),
+                new Ammo.btVector3(vertices[indices[i * 3 + 2] * 3], vertices[indices[i * 3 + 2] * 3 + 1], vertices[indices[i * 3 + 2] * 3 + 2]),
+                false
+            );
+        }
+
+        // Create the btBvhTriangleMeshShape from the btTriangleMesh
+        let shape = new Ammo.btBvhTriangleMeshShape(triangleMesh, true, true);
+        //let scale = new Ammo.btVector3(0.15933185815811157, 1.1706310510635376, 0.15933185815811157);
+        //shape.setLocalScaling(scale);
+
+        // Create the Three.js mesh
         let funnelGeometry = new THREE.BufferGeometry();
         funnelGeometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
         funnelGeometry.setIndex(indices);
-        funnelGeometry.computeVertexNormals(); // For proper lighting
-    
-        let funnelMesh = new THREE.Mesh(funnelGeometry, material);
-        //funnelMesh.position.set(x, y + 100, z);
-        funnelMesh.name = 'funnel';
-        groupMesh.add(funnelMesh);
+        funnelGeometry.computeVertexNormals();
 
-        createConvexTriangleShapeAddToCompound(compoundShape, funnelMesh);
+        let threeMesh = new THREE.Mesh(funnelGeometry, material);
+        threeMesh.name = 'funnel';
+        groupMesh.add(threeMesh);
+
+        // Add to Ammo.js physics
+        this.addToCompount(compoundShape, threeMesh, shape);
+    }
+
+    addToCompount(compoundShape, mesh, shape) { 
+        let shapeTrans = new Ammo.btTransform();
+        shapeTrans.setIdentity();
+        shapeTrans.setOrigin(new Ammo.btVector3(mesh.position.x,mesh.position.y,mesh.position.z));
+        let quat = mesh.quaternion;
+        shapeTrans.setRotation( new Ammo.btQuaternion(quat.x, quat.y, quat.z, quat.w) );
+        compoundShape.addChildShape(shapeTrans, shape);
     }
 } 
