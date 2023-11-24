@@ -13,9 +13,9 @@ import {
 
 export class FunnelTubeSystem {
     constructor() {
-        const x = 100;
-        const y = 100;
-        const z = 10;
+        const x = FLOOR_ROOF_SIZE / 2 - 50;
+        const y = WALL_HEIGHT / 2 - 100;
+        const z = 0;
         
         this.createFunnel(x, y, z);
     }
@@ -26,11 +26,11 @@ export class FunnelTubeSystem {
         // Three.js funnel geometry and mesh
         const radiusTop = 50;
         const radiusBottom = 100;
-        const height = 300;
+        const height = 30;
         const radialSegments = 32;
 
         const funnelGeometry = new THREE.ConeGeometry(radiusTop, radiusBottom, height, radialSegments, 1, true);
-        const funnelMaterial = new THREE.MeshStandardMaterial({ color: 0xCCCCCC });
+        const funnelMaterial = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
         const funnelMesh = new THREE.Mesh(funnelGeometry, funnelMaterial);
 
         // Position the funnel
@@ -43,7 +43,7 @@ export class FunnelTubeSystem {
         // Ammo.js physics for the funnel
         const shape = new Ammo.btConeShape(radiusBottom, height);
         const mass = 0; // Mass of 0 for static objects
-        const rigidBody = createAmmoRigidBody(shape, funnelMesh, mass);
+        let rigidBody = createAmmoRigidBody(shape, funnelMesh, 0.7, 0.5, funnelMesh.position, mass);
 
         funnelMesh.userData.physicsBody = rigidBody;
         phy.ammoPhysicsWorld.addRigidBody(rigidBody,
@@ -56,10 +56,7 @@ export class FunnelTubeSystem {
 
         addMeshToScene(funnelMesh);
         phy.rigidBodies.push(funnelMesh);
-        console.log(funnelMesh)
+        console.log(funnelMesh);
     }
 
-    createTube() {
-
-    }
 } 
