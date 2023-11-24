@@ -6,6 +6,7 @@ import { Ball } from './components/ball.js';
 import { createRoom } from "./components/room.js";
 import { StartBox } from './components/sequence_1';
 import { FunnelTubeSystem } from './components/sequence_2.js';
+import { Swing } from './components/sequence_3.js';
 
 export const XZPLANE_SIDELENGTH = 100;
 export const WALL_HEIGHT = 500;
@@ -89,6 +90,7 @@ function addAmmoSceneObjects() {
 	ri.scene.startBox = new StartBox();
 	ri.scene.ball = new Ball();
 	ri.scene.funnelTubeSystem = new FunnelTubeSystem();
+	ri.scene.swing = new Swing();
 
 	ri.scene.traverse((object) => {
 		console.log(object);

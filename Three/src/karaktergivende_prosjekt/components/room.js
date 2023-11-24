@@ -2,7 +2,13 @@ import * as THREE from 'three';
 import { addMeshToScene, createTexturedMesh } from '../utils/myThreeHelper';
 import { createAmmoRigidBody, phy } from '../utils/myAmmoHelper';
 import { WALL_HEIGHT, FLOOR_ROOF_SIZE } from '../script';
-
+import {
+	COLLISION_GROUP_BOX,COLLISION_GROUP_HINGE_SPHERE,
+	COLLISION_GROUP_MOVEABLE,
+	COLLISION_GROUP_PLANE,
+	COLLISION_GROUP_SPHERE,
+	COLLISION_GROUP_SPRING
+} from "../utils/myAmmoHelper";
 
 
 // Function to create the floor
@@ -24,7 +30,14 @@ function createFloor() {
 	floorMesh.userData.physicsBody = rigidBody;
 
 	// Legger til physics world:
-	phy.ammoPhysicsWorld.addRigidBody(rigidBody);
+	phy.ammoPhysicsWorld.addRigidBody(
+        rigidBody,
+        COLLISION_GROUP_PLANE,
+        COLLISION_GROUP_BOX |
+            COLLISION_GROUP_SPHERE |
+            COLLISION_GROUP_MOVEABLE |
+            COLLISION_GROUP_PLANE |
+            COLLISION_GROUP_SPRING);
 
 	addMeshToScene(floorMesh);
 	phy.rigidBodies.push(floorMesh);
