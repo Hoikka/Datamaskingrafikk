@@ -32,46 +32,61 @@ export class Swing {
     
         let material = new THREE.MeshStandardMaterial({ color: 0x00ff00, side: THREE.DoubleSide });
     
-        let plankRigidBody = this.createPlank(material, position, plankWidth, plankLength, plankDepth, radius);
+        let plankRigidBody = this.createPlank(material, position, plankWidth, plankLength, plankDepth, radius, height);
         let baseRigidBody = this.createBase(material, position, radius, height);
     
-        // Plank pivot at one end of the plank (edge of its length)
-        const plankPivot = new Ammo.btVector3(0, 0, plankLength / 2);
-    
-        // Base pivot at the top center of the cylinder
-        const basePivot = new Ammo.btVector3(0, height / 2, 0);
+        const plankPivot = new Ammo.btVector3(20, 0, 0);
+        const plankAxis = new Ammo.btVector3(0, 1, 0);
+        const basePivot = new Ammo.btVector3(0, 0, 0);
+        const baseAxis = new Ammo.btVector3(0, 1, 0);
     
         const hingeConstraint = new Ammo.btHingeConstraint(
             baseRigidBody,
             plankRigidBody,
             basePivot,
             plankPivot,
-            new Ammo.btVector3(0, 1, 0), // Axis along Y-axis
-            new Ammo.btVector3(0, 1, 0), // Same for both
+            plankAxis,
+            baseAxis,
             false
         );
     
-        const lowerLimit = -Math.PI / 2;
-        const upperLimit = Math.PI / 2;
-        hingeConstraint.setLimit(lowerLimit, upperLimit, 0.9, 0.3, 1.0);
-        hingeConstraint.enableAngularMotor(true, 0, 0.5);
+        const lowerLimit = -Math.PI / 24;
+        const upperLimit = Math.PI / 24;
+        const softness = 0.9;
+        const biasFactor = 0.3;
+        const relaxationFactor = 1.0;
+        //hingeConstraint.setLimit(lowerLimit, upperLimit, softness, biasFactor, relaxationFactor);
+        //hingeConstraint.enableAngularMotor(true, -1, 0.5);
+ 
         phy.ammoPhysicsWorld.addConstraint(hingeConstraint, false);
     }
     
 
     createPlank(material, position, plankWidth, plankLength, plankDepth, radius) {
-        const plankMass = 10; // A non-zero mass makes the plank dynamic
+        const plankMass = 20; // A non-zero mass makes the plank dynamic
     
         // Creating the plank mesh
         const plankGeometry = new THREE.BoxGeometry(plankLength, plankWidth, plankDepth);
         const plankMesh = new THREE.Mesh(plankGeometry, material);
-        plankMesh.position.set(position.x, position.y + radius, position.z);
+        plankMesh.position.set(position.x - 15, position.y + 50, position.z);
         plankMesh.rotation.set(Math.PI / 2, 0, 10 * Math.PI / 180);
     
         // Creating Ammo.js rigid body for the plank
         const shape = new Ammo.btBoxShape(new Ammo.btVector3(plankLength / 2, plankWidth / 2, plankDepth / 2));
         const plankRigidBody = createAmmoRigidBody(shape, plankMesh, 0.4, 0.6, plankMesh.position, plankMass);
-        plankRigidBody.setDamping(0.1, 0.5);
+
+        //plankRigidBody.setMassProps(plankMass, new Ammo.btVector3(1, 0, 1)); // Adjust inertia as needed
+        //plankRigidBody.setActivationState(Ammo.DISABLE_DEACTIVATION); // Prevents the plank from going to sleep
+        plankRigidBody.setRestitution(0.1);
+        plankRigidBody.setFriction(0.8);
+        plankRigidBody.setDamping(0.9, 0.9);
+
+        let transform = new Ammo.btTransform();
+        plankRigidBody.getMotionState().getWorldTransform(transform);
+        transform.setOrigin(new Ammo.btVector3(plankMesh.position.x, plankMesh.position.y, plankMesh.position.z));
+        plankRigidBody.getMotionState().setWorldTransform(transform);
+
+        //plankRigidBody.setDamping(0.5, 0.1);
         plankMesh.userData.physicsBody = plankRigidBody;
 
         phy.ammoPhysicsWorld.addRigidBody(

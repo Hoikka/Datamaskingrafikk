@@ -25,7 +25,7 @@ export class Ball {
     }
 
     createBall(radius, color=0x00FF00, position={x:0, y:50, z:0}) {
-        const mass = 100;
+        const mass = 200;
 
         //THREE
         let mesh = new THREE.Mesh(
