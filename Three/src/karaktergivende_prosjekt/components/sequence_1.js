@@ -25,8 +25,7 @@ export class StartBox {
 
         this.createBox(wallCenterX, wallCenterY, 0);
         this.button = this.createButton(wallCenterX, wallCenterY, 0);
-        //this.bottom = this.createHingedBoxBottom(wallCenterX, wallCenterY, 0);
-        //this.createHinge(wallCenterX, wallCenterY, 0);
+        this.bottom = this.createHingedBoxBottom(wallCenterX, wallCenterY, 0);
     }
 
 
@@ -75,46 +74,9 @@ export class StartBox {
         }
     }
 
-    
-    createHinge(x, y, z) {
-        //console.log('createHinge');
-        const anchor = this.createAnchor(x, y, z);
-        const boxBottom = this.bottom;
-        const armLength = anchor.threeMesh.geometry.parameters.width;
-        //console.log("Before hinge setup - Bottom position:", boxBottom.position);
-        //console.log("Before hinge setup - Anchor position:", anchor.position);
-
-        //AMMO, hengsel: SE F.EKS: https://www.panda3d.org/manual/?title=Bullet_Constraints#Hinge_Constraint:
-        const anchorPivot = new Ammo.btVector3( 0, 0.5, 0 );
-        const anchorAxis = new Ammo.btVector3(0,1,0);
-        const armPivot = new Ammo.btVector3( - armLength/2, 0, 0 );
-        const armAxis = new Ammo.btVector3(0,1,0);
-        this.hingeConstraint = new Ammo.btHingeConstraint(
-            anchor,
-            boxBottom,
-            anchorPivot,
-            armPivot,
-            anchorAxis,
-            armAxis,
-            false
-        );
-
-        const lowerLimit = -Math.PI/2;
-        const upperLimit = Math.PI/2;
-        const softness = 0.9;
-        const biasFactor = 0.3;
-        const relaxationFactor = 1.0;
-        //hingeConstraint.setLimit( lowerLimit, upperLimit, softness, biasFactor, relaxationFactor);
-        //hingeConstraint.enableAngularMotor(true, 0, 0.5);
-        this.hingeConstraint.setLimit(-Math.PI / 2, Math.PI / 2);
-        phy.ammoPhysicsWorld.addConstraint( this.hingeConstraint, false );
-        //console.log("After hinge setup - Bottom position:", boxBottom.position);
-        //console.log("After hinge setup - Anchor position:", anchor.position);
-    }
-
     createHingedBoxBottom(x, y, z) {
         //console.log('createHingedBoxBottom');
-        const mass = 10;
+        const mass = 0;
         const boxHeight = BOX_HEIGHT;
         const boxBottomThickness = 0.01;
         x -= boxHeight / 2; // Adjust for the center of the box
@@ -154,45 +116,6 @@ export class StartBox {
         return bottomMesh;
     }
 
-    createAnchor(x, y, z, color=0xb846db) {
-        //console.log('createAnchor');
-        const radius = 1;
-        const mass = 0;
-        const boxHeight = BOX_HEIGHT;
-        x -= boxHeight / 2; // Adjust for the center of the box
-    
-        //THREE
-        const mesh = new THREE.Mesh(
-            new THREE.SphereGeometry(radius, 32, 32),
-            new THREE.MeshStandardMaterial({color: color, transparent: true, opacity: 0.5}));
-        mesh.name = 'hinge_anchor';
-        mesh.position.set(x, y - boxHeight / 2, z);
-        mesh.castShadow = true;
-        mesh.receiveShadow = true;
-        mesh.collisionResponse = (mesh1) => {
-            mesh1.material.color.setHex(Math.random() * 0xffffff);
-        };
-        //AMMO
-        const shape = new Ammo.btSphereShape(mesh.geometry.parameters.radius);
-        shape.setMargin( 0.05 );
-        const rigidBody = createAmmoRigidBody(shape, mesh, 0.4, 0.6, mesh.position, mass);
-        mesh.userData.physicsBody = rigidBody;
-        phy.ammoPhysicsWorld.addRigidBody(
-            rigidBody,
-            COLLISION_GROUP_HINGE_SPHERE,
-            COLLISION_GROUP_SPHERE | 
-            COLLISION_GROUP_BOX | 
-            COLLISION_GROUP_MOVEABLE | 
-            COLLISION_GROUP_PLANE );
-        phy.rigidBodies.push(mesh);
-        rigidBody.threeMesh = mesh;
-    
-        addMeshToScene(mesh);
-        phy.rigidBodies.push(mesh);
-        rigidBody.threeMesh = mesh;
-    
-        return rigidBody;
-    }
 
     createButton(x, y, z) {
         const buttonRadius = BOX_HEIGHT / 4;
@@ -214,21 +137,25 @@ export class StartBox {
 
     updatePhysicsBodyRotation(mesh, newRotation) {
         let physicsBody = mesh.userData.physicsBody;
+        if (!physicsBody) return;
+    
         let transform = new Ammo.btTransform();
         physicsBody.getMotionState().getWorldTransform(transform);
     
         let quaternion = new THREE.Quaternion();
-        quaternion.setFromEuler(new THREE.Euler(newRotation.x, newRotation.y, newRotation.z));
-        
+        quaternion.setFromEuler(newRotation);
+            
         transform.setRotation(new Ammo.btQuaternion(quaternion.x, quaternion.y, quaternion.z, quaternion.w));
         physicsBody.getMotionState().setWorldTransform(transform);
+        physicsBody.activate(true);
     }
+    
 
     pushButton() {
         // Move the button down
         this.button.position.y -= 3;
 
-        this.openBox(this.bottom);
+        this.openBox();
     
         // Use a timeout to move it back up
         setTimeout(() => {
@@ -237,44 +164,23 @@ export class StartBox {
     }
     
 
-    openBox(mesh) {
-
-        if (!mesh.userData.physicsBody)
-		    return;
-
-        const rigidBody = mesh.userData.physicsBody;
-        rigidBody.activate(true);
-
-        // Adjust the limits of the hinge to allow the box to swing open
-        const newLowerLimit = -Math.PI / 2;  // or other appropriate value
-        const newUpperLimit = Math.PI / 2;   // or other appropriate value
-        this.hingeConstraint.setLimit(newLowerLimit, newUpperLimit);
-
-        // Optionally, apply a small impulse to start the motion
-        // The direction and magnitude of the impulse might need to be adjusted based on your setup
-        const impulseMagnitude = 10;  // Adjust as needed
-        const impulseDirection = new Ammo.btVector3(0, -impulseMagnitude, 0); // Downward impulse
-        const impulseLocation = new Ammo.btVector3(0, 0, 0); // Apply at the center of the bottom
-
-        rigidBody.applyImpulse(impulseDirection, impulseLocation);
+    openBox() {
+        if (!this.isOpen) {
+            console.log('openBox');
+            const currentRotation = this.bottom.rotation;
+            let tween = new TWEEN.Tween({ r: 0 })
+                .to([{ r: -90 }], 2000)
+                .easing(TWEEN.Easing.Bounce.Out)
+                .onUpdate((obj) => {
+                    this.bottom.rotation.x = obj.r;
+                    this.updatePhysicsBodyRotation(this.bottom, new THREE.Euler(obj.r, currentRotation.y, currentRotation.z));
+                    //console.log("Box rotation:", obj);
+                })
+                
+            tween.start();
+    
+            this.isOpen = true;
         }
-
-        //if (this.isOpen){
-
-        //} else {
-        //    console.log(this.bottom.rotation.x);
-        //    let tween = new TWEEN.Tween({r: 0})
-        //        .to([{r: -90}], 2000)
-        //        .easing(TWEEN.Easing.Bounce.Out)
-        //        .yoyo(true)
-        //        .onUpdate((obj) => {
-        //            console.log(this.bottom.rotation.x);
-        //            this.bottom.rotation.x = obj.r * Math.PI / 180;
-        //            updatePhysicsBodyRotation(this.bottom, new THREE.Vector3(newRotation, 0, 0));
-        //        });
-        //    tween.start();
-
-        //    this.isOpen = true;
-        //}
-    //}
+    }
+    
 }

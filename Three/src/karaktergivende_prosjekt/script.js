@@ -1,6 +1,7 @@
 import '../../static/style.css';
 import * as THREE from "three";
 import Stats from 'stats.js';
+import * as TWEEN from '@tweenjs/tween.js'   // HUSK: npm install @tweenjs/tween.js
 
 import { Ball } from './components/ball.js';
 import { createRoom } from "./components/room.js";
@@ -92,9 +93,9 @@ function addAmmoSceneObjects() {
 	ri.scene.funnelTubeSystem = new FunnelTubeSystem();
 	ri.scene.swing = new Swing();
 
-	ri.scene.traverse((object) => {
-		console.log(object);
-	});
+	//ri.scene.traverse((object) => {
+	//	console.log(object);
+	//});
 	
 
 	//createAmmoSpheres(20);
@@ -122,6 +123,9 @@ function animate(currentTime, myThreeScene, myAmmoPhysicsWorld) {
 
 	//Sjekker input:
 	handleKeys(deltaTime);
+
+	// Tween
+	TWEEN.update();
 
 	//Tegner scenen med gitt kamera:
 	renderScene();
