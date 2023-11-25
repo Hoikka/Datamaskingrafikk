@@ -15,7 +15,7 @@ export class Swing {
     constructor() {
         const x = 350;
         const y = 0;
-        const z = -30;
+        const z = 0;
 
         let position = { x: x, y: y, z: z };
 
@@ -62,6 +62,7 @@ export class Swing {
 
         let p2pConstraint = new Ammo.btPoint2PointConstraint( baseRigidBody, plankRigidBody, plankPivot, basePivot);
         phy.ammoPhysicsWorld.addConstraint( p2pConstraint, false );
+        
     }
 
     createPlank(material, position, plankWidth, plankLength, plankDepth, radius) {
@@ -70,7 +71,7 @@ export class Swing {
         // Creating the plank mesh
         const plankGeometry = new THREE.BoxGeometry(plankLength, plankWidth, plankDepth);
         const plankMesh = new THREE.Mesh(plankGeometry, material);
-        plankMesh.position.set(position.x, position.y + radius*2, position.z);
+        plankMesh.position.set(position.x, position.y + 50, position.z);
         plankMesh.rotation.set(Math.PI / 2, 0, 10 * Math.PI / 180);
     
         // Creating Ammo.js rigid body for the plank
@@ -79,6 +80,7 @@ export class Swing {
         plankMesh.userData.physicsBody = plankRigidBody;
 
         addMeshToScene(plankMesh);
+        //phy.rigidBodies.push(plankMesh);
     
         return plankRigidBody;
     }
@@ -98,7 +100,7 @@ export class Swing {
         cylinderMesh.userData.physicsBody = baseRigidBody;
 
         addMeshToScene(cylinderMesh);
-    
+        //phy.rigidBodies.push(cylinderMesh)
         return baseRigidBody;
     }
     
