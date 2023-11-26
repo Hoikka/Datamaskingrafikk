@@ -1,10 +1,10 @@
 import * as THREE from "three";
 import { createAmmoRigidBody, phy } from '../utils/myAmmoHelper';
-import { addMeshToScene, createTexturedMesh } from '../utils/myThreeHelper';
-import { createConvexTriangleShapeAddToCompound, createTriangleShapeAddToCompound } from "../utils/triangleMeshHelpers";
+import { addMeshToScene } from '../utils/myThreeHelper';
+import { createTriangleShapeAddToCompound } from "../utils/triangleMeshHelpers";
 import { WALL_HEIGHT, FLOOR_ROOF_SIZE } from '../script';
 import {
-	COLLISION_GROUP_BOX, COLLISION_GROUP_HINGE_SPHERE,
+	COLLISION_GROUP_BOX,
 	COLLISION_GROUP_MOVEABLE,
 	COLLISION_GROUP_PLANE,
 	COLLISION_GROUP_SPHERE,
@@ -21,7 +21,6 @@ export class FunnelTubeSystem {
         let position = { x: x, y: y, z: z };
 
         this.createFunnelSystem(position);
-        
     }
 
     createFunnelSystem(position) {
@@ -30,8 +29,10 @@ export class FunnelTubeSystem {
         let groupMesh = new THREE.Group();
         groupMesh.userData.tag = 'funnelSystem';
         groupMesh.position.set(position.x, position.y, position.z);
+        groupMesh.castShadow = true;
+        groupMesh.receiveShadow = true;
 
-        let material = new THREE.MeshStandardMaterial({ color: 0x00ff00, side: THREE.DoubleSide });
+        let material = new THREE.MeshStandardMaterial({ color: 0xFFFF00, side: THREE.DoubleSide });
 
         this.createCurvedSlide(groupMesh, compoundShape, material);
         this.createFunnel(groupMesh, compoundShape, material, position);
@@ -49,12 +50,10 @@ export class FunnelTubeSystem {
                 COLLISION_GROUP_SPRING
         );
 
-
         addMeshToScene(groupMesh);
         phy.rigidBodies.push(groupMesh);
         rigidBody.threeMesh = groupMesh;
     }
-
 
     createCurvedSlide(groupMesh, compoundShape, material) {
         // Define points for the curve
@@ -67,8 +66,8 @@ export class FunnelTubeSystem {
         
             // Slide points extending downward
             new THREE.Vector3(-10, -20, 0),
-            new THREE.Vector3(-30, -30, 0),
-            new THREE.Vector3(-40, -35, 0),
+            new THREE.Vector3(-30, -30, -5),
+            new THREE.Vector3(-40, -35, -10),
         ];
         let curve = new THREE.CatmullRomCurve3(points);
     
@@ -78,6 +77,7 @@ export class FunnelTubeSystem {
         // Creating the mesh
         let slideMesh = new THREE.Mesh(tubeGeometry, material);
         slideMesh.name = 'slide';
+        
         groupMesh.add(slideMesh);
         createTriangleShapeAddToCompound(compoundShape, slideMesh);
     }
@@ -131,8 +131,6 @@ export class FunnelTubeSystem {
 
         // Create the btBvhTriangleMeshShape from the btTriangleMesh
         let shape = new Ammo.btBvhTriangleMeshShape(triangleMesh, true, true);
-        //let scale = new Ammo.btVector3(0.15933185815811157, 1.1706310510635376, 0.15933185815811157);
-        //shape.setLocalScaling(scale);
 
         // Create the Three.js mesh
         let funnelGeometry = new THREE.BufferGeometry();
@@ -142,6 +140,8 @@ export class FunnelTubeSystem {
 
         let threeMesh = new THREE.Mesh(funnelGeometry, material);
         threeMesh.name = 'funnel';
+        threeMesh.castShadow = true;
+        threeMesh.receiveShadow = true;
         groupMesh.add(threeMesh);
 
         // Add to Ammo.js physics

@@ -3,13 +3,12 @@ import { addMeshToScene, createTexturedMesh } from '../utils/myThreeHelper';
 import { createAmmoRigidBody, phy } from '../utils/myAmmoHelper';
 import { WALL_HEIGHT, FLOOR_ROOF_SIZE } from '../script';
 import {
-	COLLISION_GROUP_BOX,COLLISION_GROUP_HINGE_SPHERE,
+	COLLISION_GROUP_BOX,
 	COLLISION_GROUP_MOVEABLE,
 	COLLISION_GROUP_PLANE,
 	COLLISION_GROUP_SPHERE,
 	COLLISION_GROUP_SPRING
 } from "../utils/myAmmoHelper";
-
 
 // Function to create the floor
 function createFloor() {
@@ -24,7 +23,6 @@ function createFloor() {
 
 	// AMMO:
 	let shape = new Ammo.btBoxShape(new Ammo.btVector3(FLOOR_ROOF_SIZE/2, 0, FLOOR_ROOF_SIZE/2));
-	//shape.setMargin( 0.05 );
 	let rigidBody = createAmmoRigidBody(shape, floorMesh, 0.7, 0.8, position, mass);
 
 	floorMesh.userData.physicsBody = rigidBody;
@@ -41,7 +39,7 @@ function createFloor() {
 
 	addMeshToScene(floorMesh);
 	phy.rigidBodies.push(floorMesh);
-	rigidBody.threeMesh = floorMesh; //Brukes til collision events:
+	rigidBody.threeMesh = floorMesh;
 }
 
 // Create walls
@@ -68,6 +66,7 @@ function createWalls() {
         wallMesh.position.copy(wallPositions[i]);
         wallMesh.rotation.copy(wallRotations[i]);
         wallMesh.receiveShadow = true;
+        wallMesh.castShadow = true;
         wallMesh.name = 'wall ' + i;
 
         // AMMO:

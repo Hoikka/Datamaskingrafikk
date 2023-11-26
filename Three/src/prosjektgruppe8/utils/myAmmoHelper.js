@@ -1,3 +1,5 @@
+import * as THREE from "three";
+
 export const COLLISION_GROUP_PLANE = 1;
 export const COLLISION_GROUP_SPHERE = 2;
 export const COLLISION_GROUP_MOVEABLE = 4;
@@ -54,22 +56,35 @@ export function createAmmoRigidBody(shape, threeMesh, restitution=0.7, friction=
 }
 
 export function updatePhysics(deltaTime) {
-	// Step physics world:
-	phy.ammoPhysicsWorld.stepSimulation(deltaTime, 10);
+    // Step physics world:
+    phy.ammoPhysicsWorld.stepSimulation(deltaTime, 10);
 
-	// Update rigid bodies
-	for (let i = 0; i < phy.rigidBodies.length; i++) {
-		let mesh = phy.rigidBodies[i];
-		let rigidBody = mesh.userData.physicsBody;
-		let motionState = rigidBody.getMotionState();
-		if (motionState) {
-			motionState.getWorldTransform(phy.transform);
-			let p = phy.transform.getOrigin();
-			let q = phy.transform.getRotation();
-			mesh.position.set(p.x(), p.y(), p.z());
-			mesh.quaternion.set(q.x(), q.y(), q.z(), q.w());
-		}
-	}
+    // Update rigid bodies
+    for (let i = 0; i < phy.rigidBodies.length; i++) {
+        let obj = phy.rigidBodies[i];
+
+        // If the object is a group, update each child
+        if (obj instanceof THREE.Group) {
+            obj.children.forEach(child => {
+                updateMeshPhysics(child);
+            });
+        } else {
+            // If it's not a group, update normally
+            updateMeshPhysics(obj);
+        }
+    }
+}
+
+function updateMeshPhysics(mesh) {
+    let rigidBody = mesh.userData.physicsBody;
+    let motionState = rigidBody ? rigidBody.getMotionState() : null;
+    if (motionState) {
+        motionState.getWorldTransform(phy.transform);
+        let p = phy.transform.getOrigin();
+        let q = phy.transform.getRotation();
+        mesh.position.set(p.x(), p.y(), p.z());
+        mesh.quaternion.set(q.x(), q.y(), q.z(), q.w());
+    }
 }
 
 export function moveRigidBody(movableMesh, direction) {

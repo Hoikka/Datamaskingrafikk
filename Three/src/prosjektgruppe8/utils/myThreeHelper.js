@@ -1,7 +1,5 @@
 import * as THREE from "three";
 import GUI from "lil-gui";  //NB! Må installeres før bruk: npm install --save lil-gui
-import {applyImpulse, moveRigidBody} from "./myAmmoHelper";
-import {createRandomSpheres} from "./threeAmmoShapes";
 import {TrackballControls} from "three/examples/jsm/controls/TrackballControls";
 import {ri} from "../script.js";
 
@@ -48,35 +46,29 @@ export function addLights() {
 	ambientFolder.add(ambientLight1, 'intensity').min(0).max(1).step(0.01).name("Intensity");
 	ambientFolder.addColor(ambientLight1, 'color').name("Color");
 
-	//** RETNINGSORIENTERT LYS (som gir skygge):
-	let directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
-	directionalLight.visible = true;
-	directionalLight.position.set(0, 105, 0);
-	// Viser lyskilden:
-	const directionalLightHelper = new THREE.DirectionalLightHelper( directionalLight, 10, 0xff0000);
-	directionalLightHelper.visible = true;
-	ri.scene.add(directionalLightHelper);
-	directionalLight.castShadow = true;     //Merk!
-	directionalLight.shadow.mapSize.width = 1024;
-	directionalLight.shadow.mapSize.height = 1024;
-	directionalLight.shadow.camera.near = 5;
-	directionalLight.shadow.camera.far = 110;
-	directionalLight.shadow.camera.left = -50;
-	directionalLight.shadow.camera.right = 50;
-	directionalLight.shadow.camera.top = 50;
-	directionalLight.shadow.camera.bottom = -50;
-	ri.scene.add(directionalLight);
-	// Viser lyskildekamera (hva lyskilden "ser")
-	const directionalLightCameraHelper = new THREE.CameraHelper(directionalLight.shadow.camera)
-	directionalLightCameraHelper.visible = true;
+	// SpotLight:
+	const spotLight = new THREE.SpotLight(0xffffff, 0.5, 0, Math.PI*0.1, 0, 0);
+	spotLight.visible = true;
+    spotLight.castShadow = true;
+	spotLight.position.set(0, 500, );
+	spotLight.target.position.set(0, 0, 0);
 
-	ri.scene.add(directionalLightCameraHelper);
+    spotLight.shadow.mapSize.width = 2048;
+    spotLight.shadow.mapSize.height = 2048;
+	spotLight.shadow.camera.near = 10;
+	spotLight.shadow.camera.far = 600;
+	spotLight.shadow.camera.fov = 60;
 
-	//lil-gui:
-	const directionalFolder = ri.lilGui.addFolder( 'Directional Light' );
-	directionalFolder.add(directionalLight, 'visible').name("On/Off");
-	directionalFolder.add(directionalLight, 'intensity').min(0).max(1).step(0.01).name("Intensity");
-	directionalFolder.addColor(directionalLight, 'color').name("Color");
+    ri.scene.add(spotLight);
+	ri.scene.add(spotLight.target);
+
+	ri.spotLight = spotLight;
+
+	const spotFolder = ri.lilGui.addFolder( 'Spot Light' );
+	spotFolder.add(spotLight, 'visible').name("On/Off");
+	spotFolder.add(spotLight, 'intensity').min(0).max(1).step(0.01).name("Intensity");
+	spotFolder.addColor(spotLight, 'color').name("Color");
+	spotFolder.add(spotLight.position, 'x').min(-1000).max(1000).step(1).name("X-pos");
 }
 
 const raycaster = new THREE.Raycaster();
@@ -102,31 +94,6 @@ export function onMouseClick(event) {
 	}
 }
 
-
-//Sjekker tastaturet:
-export function handleKeys(delta) {
-	if (ri.currentlyPressedKeys['KeyH']) {	//H
-		createRandomSpheres(200);
-	}
-	if (ri.currentlyPressedKeys['KeyU']) {	//H
-		const cube = ri.scene.getObjectByName("cube");
-		applyImpulse(cube.userData.physicsBody, 50, {x:0, y:1, z:0});
-	}
-
-	const movable = ri.scene.getObjectByName("movable");
-	if (ri.currentlyPressedKeys['KeyA']) {	//A
-		moveRigidBody(movable,{x: -0.2, y: 0, z: 0});
-	}
-	if (ri.currentlyPressedKeys['KeyD']) {	//D
-		moveRigidBody(movable,{x: 0.2, y: 0, z: 0});
-	}
-	if (ri.currentlyPressedKeys['KeyW']) {	//W
-		moveRigidBody(movable,{x: 0, y: 0, z: -0.2});
-	}
-	if (ri.currentlyPressedKeys['KeyS']) {	//S
-		moveRigidBody(movable,{x: 0, y: 0, z: 0.2});
-	}
-}
 
 export function onWindowResize() {
 	ri.camera.aspect = window.innerWidth / window.innerHeight;
@@ -164,4 +131,22 @@ export function createTexturedMesh(geometry, texturePath) {
     const texture = textureLoader.load(texturePath);
     const material = new THREE.MeshStandardMaterial({ map: texture });
     return new THREE.Mesh(geometry, material);
+}
+
+export function trackObjectWithCameraAndLight(objectToTrack) {
+    // Check if the object exists
+    if (!objectToTrack) return;
+
+    // Update Camera position
+    if (ri.camera) {
+        const offset = new THREE.Vector3(-100, 100, 100); // Adjust this offset as needed
+        ri.camera.position.copy(objectToTrack.position).add(offset);
+        ri.camera.lookAt(objectToTrack.position);
+    }
+
+    // Update Spotlight position
+    if (ri.spotLight) {
+        ri.spotLight.target = objectToTrack;
+        ri.spotLight.target.updateMatrixWorld();
+    }
 }

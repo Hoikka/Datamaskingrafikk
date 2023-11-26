@@ -1,6 +1,7 @@
 import '../../static/style.css';
 import * as THREE from "three";
 import Stats from 'stats.js';
+import * as TWEEN from '@tweenjs/tween.js'   // HUSK: npm install @tweenjs/tween.js
 
 import { Ball } from './components/ball.js';
 import { createRoom } from "./components/room.js";
@@ -8,31 +9,22 @@ import { StartBox } from './components/sequence_1';
 import { FunnelTubeSystem } from './components/sequence_2.js';
 import { Swing } from './components/sequence_3.js';
 
-export const XZPLANE_SIDELENGTH = 100;
 export const WALL_HEIGHT = 500;
 export const FLOOR_ROOF_SIZE = 1000;
 
-
 import {
 	createThreeScene,
-	handleKeys,
 	onMouseClick,
 	onWindowResize,
 	renderScene,
-	updateThree
+	updateThree,
+	trackObjectWithCameraAndLight
 } from "./utils/myThreeHelper.js";
 
 import {
 	createAmmoWorld,
 	updatePhysics
 } from "./utils/myAmmoHelper.js";
-
-import {
-	createAmmoCube,
-	createAmmoSpheres,
-	createAmmoXZPlane,
-	createMovable,
-} from "./utils/threeAmmoShapes.js";
 
 
 //Globale variabler:
@@ -45,7 +37,9 @@ export const ri = {
 	clock: undefined,
 	controls: undefined,
 	lilGui: undefined,
-	stats: undefined
+	stats: undefined,
+	spotLight: undefined,
+	trackedObject: undefined,
 };
 
 
@@ -56,8 +50,6 @@ export function main() {
 	document.body.appendChild( ri.stats.dom );
 
 	//Input - standard Javascript / WebGL:
-	document.addEventListener('keyup', handleKeyUp, false);
-	document.addEventListener('keydown', handleKeyDown, false);
 	document.addEventListener('click', onMouseClick);
 
 	// three:
@@ -76,31 +68,14 @@ export function main() {
 	addAmmoSceneObjects();
 }
 
-function handleKeyUp(event) {
-	ri.currentlyPressedKeys[event.code] = false;
-}
-
-function handleKeyDown(event) {
-	ri.currentlyPressedKeys[event.code] = true;
-}
-
-
 function addAmmoSceneObjects() {
 	createRoom(ri.scene);
 	ri.scene.startBox = new StartBox();
 	ri.scene.ball = new Ball();
+	ri.trackedObject = ri.scene.ball.mesh;
+
 	ri.scene.funnelTubeSystem = new FunnelTubeSystem();
 	ri.scene.swing = new Swing();
-
-	ri.scene.traverse((object) => {
-		console.log(object);
-	});
-	
-
-	//createAmmoSpheres(20);
-	//createAmmoCube();
-	//createMovable();
-
 
 	animate(0);
 }
@@ -120,8 +95,11 @@ function animate(currentTime, myThreeScene, myAmmoPhysicsWorld) {
 	//Oppdaterer fysikken:
 	updatePhysics(deltaTime);
 
-	//Sjekker input:
-	handleKeys(deltaTime);
+	// Tween
+	TWEEN.update();
+
+	// Oppdaterer kamera og lys:
+	trackObjectWithCameraAndLight(ri.trackedObject);
 
 	//Tegner scenen med gitt kamera:
 	renderScene();
