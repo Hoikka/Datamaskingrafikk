@@ -1,10 +1,10 @@
 import * as THREE from "three";
 import { createAmmoRigidBody, phy } from '../utils/myAmmoHelper';
-import { addMeshToScene, createTexturedMesh } from '../utils/myThreeHelper';
-import { createConvexTriangleShapeAddToCompound, createTriangleShapeAddToCompound } from "../utils/triangleMeshHelpers";
+import { addMeshToScene } from '../utils/myThreeHelper';
+import { createTriangleShapeAddToCompound } from "../utils/triangleMeshHelpers";
 import { WALL_HEIGHT, FLOOR_ROOF_SIZE } from '../script';
 import {
-	COLLISION_GROUP_BOX, COLLISION_GROUP_HINGE_SPHERE,
+	COLLISION_GROUP_BOX,
 	COLLISION_GROUP_MOVEABLE,
 	COLLISION_GROUP_PLANE,
 	COLLISION_GROUP_SPHERE,
@@ -30,8 +30,10 @@ export class FunnelTubeSystem {
         let groupMesh = new THREE.Group();
         groupMesh.userData.tag = 'funnelSystem';
         groupMesh.position.set(position.x, position.y, position.z);
+        groupMesh.castShadow = true;
+        groupMesh.receiveShadow = true;
 
-        let material = new THREE.MeshStandardMaterial({ color: 0x00ff00, side: THREE.DoubleSide });
+        let material = new THREE.MeshStandardMaterial({ color: 0xFFFF00, side: THREE.DoubleSide });
 
         this.createCurvedSlide(groupMesh, compoundShape, material);
         this.createFunnel(groupMesh, compoundShape, material, position);
@@ -141,6 +143,8 @@ export class FunnelTubeSystem {
 
         let threeMesh = new THREE.Mesh(funnelGeometry, material);
         threeMesh.name = 'funnel';
+        threeMesh.castShadow = true;
+        threeMesh.receiveShadow = true;
         groupMesh.add(threeMesh);
 
         // Add to Ammo.js physics

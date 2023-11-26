@@ -4,11 +4,10 @@ import { createAmmoRigidBody, phy } from '../utils/myAmmoHelper';
 import { WALL_HEIGHT, FLOOR_ROOF_SIZE } from '../script';
 import { BOX_HEIGHT } from './sequence_1.js';
 import {
-	COLLISION_GROUP_BOX, COLLISION_GROUP_HINGE_SPHERE,
+	COLLISION_GROUP_BOX, 
 	COLLISION_GROUP_MOVEABLE,
 	COLLISION_GROUP_PLANE,
 	COLLISION_GROUP_SPHERE,
-	COLLISION_GROUP_SPRING
 } from "../utils/myAmmoHelper";
 
 

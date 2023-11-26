@@ -38,7 +38,8 @@ export const ri = {
 	controls: undefined,
 	lilGui: undefined,
 	stats: undefined,
-	trackedObject: undefined
+	spotLight: undefined,
+	trackedObject: undefined,
 };
 
 

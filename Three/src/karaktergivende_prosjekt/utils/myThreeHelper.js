@@ -46,62 +46,30 @@ export function addLights() {
 	ambientFolder.add(ambientLight1, 'intensity').min(0).max(1).step(0.01).name("Intensity");
 	ambientFolder.addColor(ambientLight1, 'color').name("Color");
 
-	//** RETNINGSORIENTERT LYS (som gir skygge):
-	let directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
-	directionalLight.visible = true;
-	directionalLight.position.set(0, 105, 0);
-	// Viser lyskilden:
-	const directionalLightHelper = new THREE.DirectionalLightHelper( directionalLight, 10, 0xff0000);
-	directionalLightHelper.visible = true;
-	ri.scene.add(directionalLightHelper);
-	directionalLight.castShadow = true;     //Merk!
-	directionalLight.shadow.mapSize.width = 1024;
-	directionalLight.shadow.mapSize.height = 1024;
-	directionalLight.shadow.camera.near = 5;
-	directionalLight.shadow.camera.far = 110;
-	directionalLight.shadow.camera.left = -50;
-	directionalLight.shadow.camera.right = 50;
-	directionalLight.shadow.camera.top = 50;
-	directionalLight.shadow.camera.bottom = -50;
-	ri.scene.add(directionalLight);
-	// Viser lyskildekamera (hva lyskilden "ser")
-	const directionalLightCameraHelper = new THREE.CameraHelper(directionalLight.shadow.camera)
-	directionalLightCameraHelper.visible = true;
-
-	ri.scene.add(directionalLightCameraHelper);
-
-	//lil-gui:
-	const directionalFolder = ri.lilGui.addFolder( 'Directional Light' );
-	directionalFolder.add(directionalLight, 'visible').name("On/Off");
-	directionalFolder.add(directionalLight, 'intensity').min(0).max(1).step(0.01).name("Intensity");
-	directionalFolder.addColor(directionalLight, 'color').name("Color");
-}
-
-export function addSpotlight(mesh) {
-    const spotLight = new THREE.SpotLight(0xffffff, 1);
+	// SpotLight:
+	const spotLight = new THREE.SpotLight(0xffffff, 0.5, 0, Math.PI*0.1, 0, 0);
+	spotLight.visible = true;
     spotLight.castShadow = true;
-    spotLight.angle = Math.PI / 4;
-    spotLight.penumbra = 0.1;
-    spotLight.decay = 2;
-    spotLight.distance = 500;
+	spotLight.position.set(0, 500, );
+	spotLight.target.position.set(0, 0, 0);
 
-    spotLight.shadow.mapSize.width = 1024;
-    spotLight.shadow.mapSize.height = 1024;
+    spotLight.shadow.mapSize.width = 2048;
+    spotLight.shadow.mapSize.height = 2048;
+	spotLight.shadow.camera.near = 10;
+	spotLight.shadow.camera.far = 600;
+	spotLight.shadow.camera.fov = 60;
 
     ri.scene.add(spotLight);
+	ri.scene.add(spotLight.target);
 
-    // Store the spotlight for later use
-    ri.spotLight = spotLight;
+	ri.spotLight = spotLight;
 
-    // Update the position of the spotlight to follow the ball
-    ri.spotLight.position.copy(mesh.position);
-    ri.spotLight.target = mesh;
-
-	const spotLightFolder = ri.lilGui.addFolder('Spotlight');
-	spotLightFolder.add(ri.spotLight, 'intensity', 0, 2).name('Intensity');
-	spotLightFolder.addColor(ri.spotLight, 'color').name('Color');
+	const spotFolder = ri.lilGui.addFolder( 'Spot Light' );
+	spotFolder.add(spotLight, 'visible').name("On/Off");
+	spotFolder.add(spotLight, 'intensity').min(0).max(1).step(0.01).name("Intensity");
+	spotFolder.addColor(spotLight, 'color').name("Color");
+	spotFolder.add(spotLight.position, 'x').min(-1000).max(1000).step(1).name("X-pos");
 }
-
 
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
@@ -178,7 +146,7 @@ export function trackObjectWithCameraAndLight(objectToTrack) {
 
     // Update Spotlight position
     if (ri.spotLight) {
-        ri.spotLight.position.copy(objectToTrack.position);
+		console.log("spotlight");
         ri.spotLight.target = objectToTrack;
         ri.spotLight.target.updateMatrixWorld();
     }

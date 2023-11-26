@@ -87,7 +87,6 @@ function updateMeshPhysics(mesh) {
     }
 }
 
-
 export function moveRigidBody(movableMesh, direction) {
 	let transform = new Ammo.btTransform();
 	let motionState = movableMesh.userData.physicsBody.getMotionState();

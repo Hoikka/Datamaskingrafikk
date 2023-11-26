@@ -2,7 +2,7 @@
 
 ## Gruppe 3
 
-Eskil Hoikka & Morten Solbakken
+Eskil Hoikka
 
 ## Videolink
 
