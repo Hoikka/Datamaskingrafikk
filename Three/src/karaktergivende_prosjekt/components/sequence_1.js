@@ -82,7 +82,7 @@ export class StartBox {
     
         const bottomGeometry = new THREE.BoxGeometry(boxHeight, boxHeight, boxBottomThickness);
         const bottomMesh = createTexturedMesh(bottomGeometry, '../../../assets/textures/bricks2.jpg');
-        bottomMesh.rotation.set(-Math.PI / 2, 0, 0);
+        bottomMesh.rotation.set(Math.PI / 2, 0, 0);
         bottomMesh.castShadow = true;
         bottomMesh.receiveShadow = true;
         bottomMesh.name = 'box_bottom';
@@ -96,12 +96,16 @@ export class StartBox {
         bottomGroup.add(pivot);
         pivot.add(bottomMesh);
         bottomMesh.position.set(0, - boxHeight / 2, 0);
-        bottomGroup.position.set(x, y - boxHeight, z);
+        bottomGroup.position.set(x, y - boxHeight / 2, z - boxHeight / 2);
 
         // AMMO
         const bottomShape = new Ammo.btBoxShape(new Ammo.btVector3(boxHeight / 2, boxHeight / 2, boxBottomThickness / 2));
-        bottomShape.setMargin( 0.05 );
         const bottomBody = createAmmoRigidBody(bottomShape, bottomGroup, 0.7, 0.5, bottomGroup.position, mass);
+
+        let transform = new Ammo.btTransform();
+        bottomBody.getMotionState().getWorldTransform(transform);
+        transform.setOrigin(new Ammo.btVector3(bottomMesh.position.x, bottomMesh.position.y, bottomMesh.position.z));
+        bottomBody.getMotionState().setWorldTransform(transform);
     
         bottomMesh.userData.physicsBody = bottomBody;
 
@@ -116,13 +120,11 @@ export class StartBox {
         );
 
         addMeshToScene(bottomGroup);
-        phy.rigidBodies.push(bottomGroup);
-    
-        bottomGroup.threeMesh = bottomMesh;
+        phy.rigidBodies.push(bottomMesh);
+        bottomGroup.threeMesh = bottomGroup;
     
         return bottomGroup;
     }
-
 
     createButton(x, y, z) {
         const buttonRadius = BOX_HEIGHT / 4;
@@ -169,7 +171,6 @@ export class StartBox {
             this.button.position.y += 3; // Move back up
         }, 200);
     }
-    
 
     openBox() {
         if (!this.isOpen) {
