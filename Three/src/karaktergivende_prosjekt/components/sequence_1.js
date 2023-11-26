@@ -4,7 +4,7 @@ import { addMeshToScene, createTexturedMesh } from '../utils/myThreeHelper';
 import { WALL_HEIGHT, FLOOR_ROOF_SIZE } from '../script';
 import * as TWEEN from '@tweenjs/tween.js'   // HUSK: npm install @tweenjs/tween.js
 import {
-	COLLISION_GROUP_BOX, COLLISION_GROUP_HINGE_SPHERE,
+	COLLISION_GROUP_BOX, 
 	COLLISION_GROUP_MOVEABLE,
 	COLLISION_GROUP_PLANE,
 	COLLISION_GROUP_SPHERE,
@@ -75,7 +75,6 @@ export class StartBox {
     }
 
     createHingedBoxBottom(x, y, z) {
-        //console.log('createHingedBoxBottom');
         const mass = 0;
         const boxHeight = BOX_HEIGHT;
         const boxBottomThickness = 0.01;
@@ -83,25 +82,32 @@ export class StartBox {
     
         const bottomGeometry = new THREE.BoxGeometry(boxHeight, boxHeight, boxBottomThickness);
         const bottomMesh = createTexturedMesh(bottomGeometry, '../../../assets/textures/bricks2.jpg');
-        bottomMesh.position.set(x, y - boxHeight / 2, z);
         bottomMesh.rotation.set(-Math.PI / 2, 0, 0);
         bottomMesh.castShadow = true;
         bottomMesh.receiveShadow = true;
         bottomMesh.name = 'box_bottom';
-        //const direction = new THREE.Vector3();
-        //bottomMesh.getWorldDirection(direction);
     
+        const bottomGroup = new THREE.Group();
+
+        // Create a pivot object
+        const pivot = new THREE.Object3D();
+
+        pivot.position.set(0, boxHeight , 0);
+        bottomGroup.add(pivot);
+        pivot.add(bottomMesh);
+        bottomMesh.position.set(0, - boxHeight / 2, 0);
+        bottomGroup.position.set(x, y - boxHeight, z);
+
         // AMMO
-        const bottomShape = new Ammo.btBoxShape(new Ammo.btVector3(boxHeight / 2, boxBottomThickness / 2, boxHeight / 2));
+        const bottomShape = new Ammo.btBoxShape(new Ammo.btVector3(boxHeight / 2, boxHeight / 2, boxBottomThickness / 2));
         bottomShape.setMargin( 0.05 );
-        const bottomBody = createAmmoRigidBody(bottomShape, bottomMesh, 0.7, 0.5, bottomMesh.position, mass);
-        bottomBody.setDamping(0.1, 0.5);
-	    bottomBody.setActivationState(4);
+        const bottomBody = createAmmoRigidBody(bottomShape, bottomGroup, 0.7, 0.5, bottomGroup.position, mass);
     
         bottomMesh.userData.physicsBody = bottomBody;
+
         phy.ammoPhysicsWorld.addRigidBody(
-            bottomBody,
-            COLLISION_GROUP_BOX,
+            bottomBody,         
+            COLLISION_GROUP_MOVEABLE,
             COLLISION_GROUP_BOX |
                 COLLISION_GROUP_SPHERE |
                 COLLISION_GROUP_MOVEABLE |
@@ -109,11 +115,12 @@ export class StartBox {
                 COLLISION_GROUP_SPRING
         );
 
-        addMeshToScene(bottomMesh);
-        phy.rigidBodies.push(bottomMesh);
-        bottomBody.threeMesh = bottomMesh;
+        addMeshToScene(bottomGroup);
+        phy.rigidBodies.push(bottomGroup);
     
-        return bottomMesh;
+        bottomGroup.threeMesh = bottomMesh;
+    
+        return bottomGroup;
     }
 
 
@@ -160,27 +167,23 @@ export class StartBox {
         // Use a timeout to move it back up
         setTimeout(() => {
             this.button.position.y += 3; // Move back up
-        }, 200); // Adjust time as needed
+        }, 200);
     }
     
 
     openBox() {
         if (!this.isOpen) {
-            console.log('openBox');
-            const currentRotation = this.bottom.rotation;
-            let tween = new TWEEN.Tween({ r: 0 })
-                .to([{ r: -90 }], 2000)
+
+            const currentRotation = this.bottom.rotation; // rotation of the group
+            let tween = new TWEEN.Tween({ r: currentRotation.x })
+                .to({ r: currentRotation.x + Math.PI / 2 }, 2000)
                 .easing(TWEEN.Easing.Bounce.Out)
                 .onUpdate((obj) => {
                     this.bottom.rotation.x = obj.r;
-                    this.updatePhysicsBodyRotation(this.bottom, new THREE.Euler(obj.r, currentRotation.y, currentRotation.z));
-                    //console.log("Box rotation:", obj);
                 })
-                
-            tween.start();
+                .start();
     
             this.isOpen = true;
         }
     }
-    
 }
