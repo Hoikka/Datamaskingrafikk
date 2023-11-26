@@ -1,7 +1,5 @@
 import * as THREE from "three";
 import GUI from "lil-gui";  //NB! Må installeres før bruk: npm install --save lil-gui
-import {applyImpulse, moveRigidBody} from "./myAmmoHelper";
-import {createRandomSpheres} from "./threeAmmoShapes";
 import {TrackballControls} from "three/examples/jsm/controls/TrackballControls";
 import {ri} from "../script.js";
 
@@ -79,6 +77,32 @@ export function addLights() {
 	directionalFolder.addColor(directionalLight, 'color').name("Color");
 }
 
+export function addSpotlight(mesh) {
+    const spotLight = new THREE.SpotLight(0xffffff, 1);
+    spotLight.castShadow = true;
+    spotLight.angle = Math.PI / 4;
+    spotLight.penumbra = 0.1;
+    spotLight.decay = 2;
+    spotLight.distance = 500;
+
+    spotLight.shadow.mapSize.width = 1024;
+    spotLight.shadow.mapSize.height = 1024;
+
+    ri.scene.add(spotLight);
+
+    // Store the spotlight for later use
+    ri.spotLight = spotLight;
+
+    // Update the position of the spotlight to follow the ball
+    ri.spotLight.position.copy(mesh.position);
+    ri.spotLight.target = mesh;
+
+	const spotLightFolder = ri.lilGui.addFolder('Spotlight');
+	spotLightFolder.add(ri.spotLight, 'intensity', 0, 2).name('Intensity');
+	spotLightFolder.addColor(ri.spotLight, 'color').name('Color');
+}
+
+
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 export function onMouseClick(event) {
@@ -102,31 +126,6 @@ export function onMouseClick(event) {
 	}
 }
 
-
-//Sjekker tastaturet:
-export function handleKeys(delta) {
-	if (ri.currentlyPressedKeys['KeyH']) {	//H
-		createRandomSpheres(200);
-	}
-	if (ri.currentlyPressedKeys['KeyU']) {	//H
-		const cube = ri.scene.getObjectByName("cube");
-		applyImpulse(cube.userData.physicsBody, 50, {x:0, y:1, z:0});
-	}
-
-	const movable = ri.scene.getObjectByName("movable");
-	if (ri.currentlyPressedKeys['KeyA']) {	//A
-		moveRigidBody(movable,{x: -0.2, y: 0, z: 0});
-	}
-	if (ri.currentlyPressedKeys['KeyD']) {	//D
-		moveRigidBody(movable,{x: 0.2, y: 0, z: 0});
-	}
-	if (ri.currentlyPressedKeys['KeyW']) {	//W
-		moveRigidBody(movable,{x: 0, y: 0, z: -0.2});
-	}
-	if (ri.currentlyPressedKeys['KeyS']) {	//S
-		moveRigidBody(movable,{x: 0, y: 0, z: 0.2});
-	}
-}
 
 export function onWindowResize() {
 	ri.camera.aspect = window.innerWidth / window.innerHeight;
@@ -164,4 +163,23 @@ export function createTexturedMesh(geometry, texturePath) {
     const texture = textureLoader.load(texturePath);
     const material = new THREE.MeshStandardMaterial({ map: texture });
     return new THREE.Mesh(geometry, material);
+}
+
+export function trackObjectWithCameraAndLight(objectToTrack) {
+    // Check if the object exists
+    if (!objectToTrack) return;
+
+    // Update Camera position
+    if (ri.camera) {
+        const offset = new THREE.Vector3(-100, 100, 100); // Adjust this offset as needed
+        ri.camera.position.copy(objectToTrack.position).add(offset);
+        ri.camera.lookAt(objectToTrack.position);
+    }
+
+    // Update Spotlight position
+    if (ri.spotLight) {
+        ri.spotLight.position.copy(objectToTrack.position);
+        ri.spotLight.target = objectToTrack;
+        ri.spotLight.target.updateMatrixWorld();
+    }
 }

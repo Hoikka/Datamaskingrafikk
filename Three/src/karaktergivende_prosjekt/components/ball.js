@@ -20,7 +20,7 @@ export class Ball {
         var z = 0
 
         var position = {x: x, y: y, z: z};
-        this.createBall(radius, color, position);
+        this.mesh = this.createBall(radius, color, position);
 
     }
 
@@ -57,6 +57,8 @@ export class Ball {
         addMeshToScene(mesh);
         phy.rigidBodies.push(mesh);
         rigidBody.threeMesh = mesh;
+
+        return mesh;
     }
 
     setPosition(x, y, z) {
