@@ -16,7 +16,7 @@ export class Ball {
     constructor(radius = 7, color = 0xff0000) {
 
         var x = FLOOR_ROOF_SIZE/2 - BOX_HEIGHT /2;
-        var y = WALL_HEIGHT / 2;
+        var y = WALL_HEIGHT / 2 + 10;
         var z = 0
 
         var position = {x: x, y: y, z: z};
