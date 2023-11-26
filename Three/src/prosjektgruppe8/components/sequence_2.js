@@ -21,7 +21,6 @@ export class FunnelTubeSystem {
         let position = { x: x, y: y, z: z };
 
         this.createFunnelSystem(position);
-        
     }
 
     createFunnelSystem(position) {
@@ -51,12 +50,10 @@ export class FunnelTubeSystem {
                 COLLISION_GROUP_SPRING
         );
 
-
         addMeshToScene(groupMesh);
         phy.rigidBodies.push(groupMesh);
         rigidBody.threeMesh = groupMesh;
     }
-
 
     createCurvedSlide(groupMesh, compoundShape, material) {
         // Define points for the curve

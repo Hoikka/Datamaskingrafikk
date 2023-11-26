@@ -10,7 +10,6 @@ import {
 	COLLISION_GROUP_SPRING
 } from "../utils/myAmmoHelper";
 
-
 // Function to create the floor
 function createFloor() {
 	const mass=0;

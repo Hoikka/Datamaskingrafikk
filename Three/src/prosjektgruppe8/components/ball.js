@@ -20,7 +20,6 @@ export class Ball {
 
         var position = {x: x, y: y, z: z};
         this.mesh = this.createBall(radius, color, position);
-
     }
 
     createBall(radius, color=0x00FF00, position={x:0, y:50, z:0}) {

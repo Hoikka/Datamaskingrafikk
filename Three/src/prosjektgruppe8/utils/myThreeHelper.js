@@ -146,7 +146,6 @@ export function trackObjectWithCameraAndLight(objectToTrack) {
 
     // Update Spotlight position
     if (ri.spotLight) {
-		console.log("spotlight");
         ri.spotLight.target = objectToTrack;
         ri.spotLight.target.updateMatrixWorld();
     }
